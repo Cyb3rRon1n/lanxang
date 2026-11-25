@@ -7,6 +7,7 @@ from lanxang.inventory import save_inventory
 from lanxang.inventory import load_inventory
 from lanxang.reporting.generator import generate_report
 from lanxang.config import load_config, write_config, write_setup_log
+from lanxang.config import local
 from lanxang.config.local import config_file
 from lanxang.config.models import AtlasConfig, IntelligenceConfig, MonitoringConfig, ProxmoxConfig
 from lanxang.health import run_checks
@@ -159,10 +160,7 @@ def init():
 
             token_name = typer.prompt("Token name")
 
-            token_value = typer.prompt(
-                "Token value (typed here, visible as you type - this "
-                "prompt does not hide input)"
-            )
+            token_value = typer.prompt("Token value (hidden as you type)", hide_input=True)
 
             password = ""
             auth = "token"
@@ -172,10 +170,7 @@ def init():
             token_name = ""
             token_value = ""
 
-            password = typer.prompt(
-                "Password (visible as you type - this prompt does not "
-                "hide input)"
-            )
+            password = typer.prompt("Password (hidden as you type)", hide_input=True)
 
             auth = "password"
 
@@ -349,6 +344,16 @@ def init():
 
         return
 
+    # secrets go to inventory/secrets.json (mode 600); the config file, readable by the container, only names them
+    found = {"LANXANG_PROXMOX_TOKEN": config.proxmox.token_value, "LANXANG_PROXMOX_PASSWORD": config.proxmox.password}
+    found = {name: value for name, value in found.items() if value}
+    if found:
+        local.save_secrets(found)
+        if config.proxmox.token_value:
+            config.proxmox.token_value = "${LANXANG_PROXMOX_TOKEN}"
+        if config.proxmox.password:
+            config.proxmox.password = "${LANXANG_PROXMOX_PASSWORD}"
+
     write_config(config)
 
     log_lines.append(f"{config_file()} written")
@@ -459,9 +464,7 @@ def config():
         "[bold cyan]Lanxang Configuration[/bold cyan]"
     )
 
-    console.print(
-        settings.model_dump()
-    )
+    console.print(local.redacted(settings.model_dump()))
 
 
 @app.command()
@@ -518,7 +521,8 @@ def runtime():
 
     console.print("[bold blue]Lanxang Runtime[/bold blue]\n")
 
-    console.print(ctx)
+    from dataclasses import replace
+    console.print(replace(ctx, config=local.redacted(ctx.config)))
 
 @app.command()
 def plugins():
