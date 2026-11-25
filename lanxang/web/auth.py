@@ -52,6 +52,9 @@ def check_password(password, stored):
         return False
 
 
+_CHECKING = threading.BoundedSemaphore(2)    # scrypt takes ~16 MB each; a flood of sign-ins waits instead of piling up
+
+
 class Auth:
 
     def __init__(self, path=AUTH_FILE):
@@ -94,7 +97,7 @@ class Auth:
 
         expected = self._load().get("setup_code") or ""
 
-        return bool(expected) and hmac.compare_digest(expected, (code or "").strip().lower())
+        return bool(expected) and hmac.compare_digest(expected.encode(), (code or "").strip().lower().encode())
 
     def set_password(self, password):
         """New hash and a new signing secret, so every existing session ends."""
@@ -130,7 +133,7 @@ class Auth:
 
         token = self._load().get("token") or ""
 
-        return bool(token and value) and hmac.compare_digest(token, value)
+        return bool(token and value) and hmac.compare_digest(token.encode(), value.encode())
 
     def _sign(self, secret, expiry):
 
@@ -150,7 +153,7 @@ class Auth:
             return False
 
         return (int(expiry) > (now if now is not None else time.time())
-                and hmac.compare_digest(self._sign(secret, int(expiry)), signature))
+                and hmac.compare_digest(self._sign(secret, int(expiry)).encode(), signature.encode()))
 
     def limited(self, client, now=None):
 
@@ -164,14 +167,18 @@ class Auth:
         """A session cookie value, None for a wrong password, or "limited" after too many failures."""
 
         now = now if now is not None else time.time()
-        if self.limited(client, now):
-            return "limited"
-        if check_password(password or "", self._load().get("password")):
-            with self._lock:
-                self._fails.pop(client, None)
-            return self.session(now)
         with self._lock:
             # drop clients whose failures have all aged out, so a stream of guesses from many addresses can't grow this
             self._fails = {c: times for c, times in self._fails.items() if times and now - times[-1] < FAIL_WINDOW}
-            self._fails.setdefault(client, []).append(now)
+            recent = [t for t in self._fails.get(client, []) if now - t < FAIL_WINDOW]
+            if len(recent) >= MAX_FAILS:
+                return "limited"
+            # count the attempt before checking it, so parallel guesses can't all slip in under the limit
+            self._fails[client] = recent + [now]
+        with _CHECKING:
+            ok = check_password(password or "", self._load().get("password"))
+        if ok:
+            with self._lock:
+                self._fails.pop(client, None)
+            return self.session(now)
         return None

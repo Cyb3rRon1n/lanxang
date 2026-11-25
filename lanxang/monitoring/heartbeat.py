@@ -45,7 +45,7 @@ def find(supplied, heartbeats, key=None):
     """The heartbeat whose token this is, or None. Constant-time compares."""
 
     key = key or _key()
-    return next((hb for hb in heartbeats if hmac.compare_digest(token(hb.name, key), supplied)), None)
+    return next((hb for hb in heartbeats if hmac.compare_digest(token(hb.name, key).encode(), (supplied or "").encode())), None)
 
 
 def ping(store, name, now, failed=False):

@@ -57,6 +57,10 @@ networks:
     external: true
 ```
 
+With `web.auth: builtin` behind a proxy, Lanxang counts wrong passwords per visitor using the proxy's
+`X-Forwarded-For`, but only from peers in `web.trusted_proxies` (default: loopback and Docker's `172.16.0.0/12`).
+If your proxy connects from another address, add it there; from anywhere else the header is ignored.
+
 Then the tile, in Homepage's `services.yaml` - with live counts from Lanxang's `/api/summary`
 (a small read-only JSON view of the latest network map):
 

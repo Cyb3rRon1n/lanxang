@@ -5,6 +5,16 @@ Docker image is published as `ghcr.io/cyb3rron1n/lanxang:<version>` for every re
 
 ## Unreleased
 
+### Security
+- Sign-in: parallel wrong passwords can no longer slip past the five-guess limit, and only a few password checks run
+  at once.
+- `X-Forwarded-For` is believed only from `web.trusted_proxies` (new; default loopback and Docker's networks), so a
+  LAN visitor can no longer dodge the limit or lock the admin out by writing the header.
+- The setup code is no longer checked once the visitor is over the limit.
+- The address to return to after sign-in refuses tabs and line breaks (an open redirect and a header split).
+- Connections that stall mid-request are dropped after 30 seconds instead of holding a thread for good.
+- A non-ASCII API key, cookie or heartbeat token is rejected instead of dropping the connection.
+
 ### Fixed
 - The speed test card labels its low point "Slowest, 30 days" (it counted tests, not days).
 

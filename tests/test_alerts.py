@@ -127,7 +127,7 @@ def test_a_muted_problem_is_listed_but_not_sent(temp_db):
     store = AlertStore(temp_db)
     store.mute(store.listing(NOW)["open"][0]["id"], 7, NOW)
 
-    later = utcnow()
+    later = NOW + timedelta(hours=1)
     posture.set_status("lan", True, {}, later)                         # forget it, so the check alerts again
     lanwatch.run(settings, posture, later, probe=offer, read=read, send=sent.append)
     assert len(sent) == 1 and len(store.listing(later)["open"]) == 1     # still listed, nothing sent

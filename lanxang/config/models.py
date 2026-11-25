@@ -261,6 +261,8 @@ class WebConfig(BaseModel):
     # builtin: atlas asks for its own admin password (lanxang.web.auth).
     # proxy: an auth proxy (Authelia, Authentik, ...) in front of atlas does it - atlas checks nothing.
     auth: Literal["builtin", "proxy"] = "builtin"
+    # Peers whose X-Forwarded-For names the visitor (for the wrong-password limit): loopback and Docker's networks.
+    trusted_proxies: list[str] = ["127.0.0.0/8", "::1/128", "172.16.0.0/12"]
 
 
 class UptimeCheck(BaseModel):
