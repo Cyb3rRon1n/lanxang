@@ -3,7 +3,7 @@ Pi-hole (v6) or AdGuard Home: is ad blocking on, how many DNS questions were ask
 devices ask the most. Read-only, checked with every `lanxang scan` (and `lanxang dns check`).
 
   Pi-hole v6   POST /api/auth with the password or an app password -> a session id, sent as X-FTL-SID;
-               the session is ended (DELETE /api/auth) after each read, so atlas never uses up Pi-hole's
+               the session is ended (DELETE /api/auth) after each read, so Lanxang never uses up Pi-hole's
                16 session slots. No password set = no login.
   AdGuard Home basic auth on /control/status (protection on or off), /control/stats and
                /control/filtering/status (blocklist size).

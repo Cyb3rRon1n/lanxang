@@ -1,4 +1,4 @@
-from lanxang.intelligence.analyzer import AtlasAnalyzer
+from lanxang.intelligence.analyzer import LanxangAnalyzer
 from lanxang.intelligence.providers.base import (
     AIProvider,
     AnalysisResult,
@@ -39,7 +39,7 @@ def test_analyzer_delegates_to_provider_and_returns_its_result():
     )
 
     provider = FakeProvider(expected)
-    analyzer = AtlasAnalyzer(provider)
+    analyzer = LanxangAnalyzer(provider)
 
     environment = {"system": {"hostname": "homelab"}}
 
@@ -63,7 +63,7 @@ def test_analyzer_keeps_action_when_target_is_a_known_container():
         ]
     )
 
-    analyzer = AtlasAnalyzer(FakeProvider(result))
+    analyzer = LanxangAnalyzer(FakeProvider(result))
 
     environment = {
         "containers": {
@@ -97,7 +97,7 @@ def test_analyzer_drops_action_when_target_is_not_a_known_container():
         ]
     )
 
-    analyzer = AtlasAnalyzer(FakeProvider(result))
+    analyzer = LanxangAnalyzer(FakeProvider(result))
 
     environment = {
         "containers": {
@@ -127,7 +127,7 @@ def test_analyzer_keeps_action_when_target_is_a_known_guest():
         ]
     )
 
-    analyzer = AtlasAnalyzer(FakeProvider(result))
+    analyzer = LanxangAnalyzer(FakeProvider(result))
 
     environment = {
         "virtualization": {
@@ -155,7 +155,7 @@ def test_analyzer_drops_action_when_target_is_not_a_known_guest():
         ]
     )
 
-    analyzer = AtlasAnalyzer(FakeProvider(result))
+    analyzer = LanxangAnalyzer(FakeProvider(result))
 
     environment = {
         "virtualization": {
@@ -189,7 +189,7 @@ def test_analyzer_drops_action_with_unrecognized_type():
         ]
     )
 
-    analyzer = AtlasAnalyzer(FakeProvider(result))
+    analyzer = LanxangAnalyzer(FakeProvider(result))
 
     environment = {
         "containers": {
@@ -224,7 +224,7 @@ def test_analyzer_keeps_plan_when_every_step_is_grounded():
         )
     )
 
-    analyzer = AtlasAnalyzer(FakeProvider(result))
+    analyzer = LanxangAnalyzer(FakeProvider(result))
 
     environment = {
         "containers": {
@@ -268,7 +268,7 @@ def test_analyzer_drops_entire_plan_when_one_step_is_ungrounded():
         )
     )
 
-    analyzer = AtlasAnalyzer(FakeProvider(result))
+    analyzer = LanxangAnalyzer(FakeProvider(result))
 
     environment = {
         "containers": {
@@ -288,7 +288,7 @@ def test_analyzer_leaves_plan_as_none_when_no_plan_was_suggested():
 
     result = AnalysisResult(summary="Nothing to report.")
 
-    analyzer = AtlasAnalyzer(FakeProvider(result))
+    analyzer = LanxangAnalyzer(FakeProvider(result))
 
     analyzed = analyzer.analyze({"system": {}})
 
@@ -309,7 +309,7 @@ def test_analyzer_keeps_action_when_stop_target_is_a_known_container():
         ]
     )
 
-    analyzer = AtlasAnalyzer(FakeProvider(result))
+    analyzer = LanxangAnalyzer(FakeProvider(result))
 
     environment = {
         "containers": {
@@ -339,7 +339,7 @@ def test_analyzer_drops_action_when_stop_target_is_not_a_known_container():
         ]
     )
 
-    analyzer = AtlasAnalyzer(FakeProvider(result))
+    analyzer = LanxangAnalyzer(FakeProvider(result))
 
     environment = {
         "containers": {

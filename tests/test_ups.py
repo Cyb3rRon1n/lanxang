@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import pytest
 
 from lanxang.alerts import AlertStore
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.monitoring import ups
 from lanxang.posture.store import PostureStore
 from lanxang.web.uptime_page import render_uptime_page
@@ -56,7 +56,7 @@ def test_fetch_reads_every_ups_and_refuses_an_unknown_one(nut):
 
 def test_power_cut_low_battery_and_back(nut, temp_db):
 
-    settings = AtlasConfig(ups={"enabled": True, "host": "127.0.0.1", "port": nut})
+    settings = LanxangConfig(ups={"enabled": True, "host": "127.0.0.1", "port": nut})
     store, sent, start = PostureStore(), [], datetime(2026, 1, 1, 20)
     steps = [("OL", "100", "2400"), ("OB DISCHRG", "87", "1500"), ("OB DISCHRG LB", "9", "120"),
              ("OL CHRG", "12", "2400")]
@@ -77,7 +77,7 @@ def test_power_cut_low_battery_and_back(nut, temp_db):
 
 def test_a_blip_reading_the_server_is_not_a_power_change(nut, temp_db):
 
-    settings = AtlasConfig(ups={"enabled": True, "host": "127.0.0.1", "port": nut})
+    settings = LanxangConfig(ups={"enabled": True, "host": "127.0.0.1", "port": nut})
     store, sent, now = PostureStore(), [], datetime(2026, 1, 1, 20)
     STATE.update(status="OL", charge="100", runtime="2400")
     ups.run(settings, store, now, send=sent.append)
@@ -105,7 +105,7 @@ def test_setup_card_tests_the_ups_server(nut, isolated_cwd, monkeypatch):
 def test_a_blip_during_a_power_cut_keeps_the_alert_open(nut, temp_db):
     from lanxang.alerts import AlertStore
 
-    settings = AtlasConfig(ups={"enabled": True, "host": "127.0.0.1", "port": nut})
+    settings = LanxangConfig(ups={"enabled": True, "host": "127.0.0.1", "port": nut})
     store, now = PostureStore(), datetime(2026, 1, 1, 20)
     STATE.update(status="OB", charge="80", runtime="1200")
     ups.run(settings, store, now, send=lambda text: None)

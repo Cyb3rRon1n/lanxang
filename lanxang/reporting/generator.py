@@ -77,7 +77,7 @@ def generate_report(inventory):
 
     output = (
         REPORT_DIRECTORY /
-        "atlas-report.md"
+        "lanxang-report.md"
     )
 
     output.write_text(

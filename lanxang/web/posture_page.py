@@ -214,7 +214,7 @@ function renderReview(items) {
       r.asn_key + ", " + (r.cc || "?") + ")");
     const batches = [];
     for (let i = 0; i < lines.length; i += 6) batches.push(reviewQuestion(lines.slice(i, i + 6)));
-    if (window.atlasAskAll) window.atlasAskAll(batches); else ask(batches.join("\\n\\n"));
+    if (window.lanxangAskAll) window.lanxangAskAll(batches); else ask(batches.join("\\n\\n"));
   });
   reviewList.prepend(el("li", undefined, "all"));
   reviewList.firstChild.append(all);
@@ -228,7 +228,7 @@ function reviewQuestion(lines) {
     "most suspicious first:\\n" + lines.join("\\n");
 }
 
-function ask(text) { if (window.atlasAsk) window.atlasAsk(text); else location.href = "/chat?q=" + encodeURIComponent(text); }
+function ask(text) { if (window.lanxangAsk) window.lanxangAsk(text); else location.href = "/chat?q=" + encodeURIComponent(text); }
 
 // Builds the review question from what posture already knows (ports, traffic, addresses), so the chat has the facts.
 async function investigate(button, r) {
@@ -321,11 +321,11 @@ async function select(id) {
   d.sources.forEach((s) => ul.append(el("li", s.source + " · " + fmt(s.bytes))));
   panel.append(ul);
   const ask = el("button", "Ask Lanxang about this", "primary");
-  ask.id = "ask-atlas";
+  ask.id = "ask-lanxang";
   ask.dataset.prefill = "Why is " + d.sources.map((s) => s.source).join(", ") + " talking to " + (d.org || d.asn_key) +
     " (" + d.asn_key + ", " + (d.cc || "?") + ", ports " + d.ports.join(",") + ")? Is this expected?";
   ask.addEventListener("click", () => { const text = ask.dataset.prefill;
-    if (window.atlasAsk) window.atlasAsk(text); else location.href = "/chat?q=" + encodeURIComponent(text); });
+    if (window.lanxangAsk) window.lanxangAsk(text); else location.href = "/chat?q=" + encodeURIComponent(text); });
   panel.append(ask);
   if (!d.known) d.sources.forEach((s) => {
     const mark = el("button", "Mark expected for " + s.source);

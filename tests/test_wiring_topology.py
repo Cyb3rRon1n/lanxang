@@ -1,6 +1,6 @@
 import copy
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.web.cabling_page import render_cabling_page
 from lanxang.wiring.build import build_wiring
 from lanxang.wiring.scan import run_scan
@@ -99,7 +99,7 @@ def test_no_spanning_tree_data_keeps_the_old_warning():
 
 
 def test_loop_alerts_once_then_resolves(temp_db, tmp_path):
-    settings = AtlasConfig(wiring={"enabled": True, "cabling_file": str(tmp_path / "cabling.yaml"),
+    settings = LanxangConfig(wiring={"enabled": True, "cabling_file": str(tmp_path / "cabling.yaml"),
                                    "unifi": {"enabled": True, "url": "https://192.0.2.1"},
                                    "switches": [{"name": "core-switch", "host": "192.0.2.2"}]})
     unifi = lambda *a, **k: parse_unifi(DEVICES, CLIENTS)

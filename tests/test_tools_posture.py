@@ -1,6 +1,6 @@
 from lanxang.alerts import AlertStore
 from lanxang.clock import utcnow
-from lanxang.config.models import AtlasConfig, UptimeCheck
+from lanxang.config.models import LanxangConfig, UptimeCheck
 from lanxang.devices import Sighting
 from lanxang.devices.store import InventoryStore
 from lanxang.intelligence.tools import _cap, build_tools, execute_tool
@@ -12,7 +12,7 @@ NAMES = ("get_posture", "get_devices", "get_alerts", "get_disks", "get_uptime")
 
 
 def config(**posture):
-    settings = AtlasConfig()
+    settings = LanxangConfig()
     settings.posture.enabled = posture.get("enabled", True)
     settings.posture.internet_view = posture.get("internet_view", False)
     settings.uptime.checks = [UptimeCheck(name="Media", target="192.0.2.5:8096")]
@@ -97,7 +97,7 @@ def test_tools_say_not_set_up(isolated_cwd, temp_db):
     assert run(config(), "get_posture")["status"] == "not set up"
     assert "how" in run(config(), "get_posture")
     assert run(config(), "get_disks")["status"] == "not set up"
-    empty = AtlasConfig()
+    empty = LanxangConfig()
     assert run(empty, "get_uptime")["status"] == "not set up"
 
 

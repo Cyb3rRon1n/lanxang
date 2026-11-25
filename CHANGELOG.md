@@ -12,6 +12,12 @@ Docker image is published as `ghcr.io/cyb3rron1n/lanxang:<version>` for every re
   breaking release can't reach a new image unnoticed.
 - The database is set up once per process instead of on every store, which makes pages lighter.
 - CI lints with ruff (pyflakes only), caches pip, and builds the Docker image on every pull request.
+- The last Atlas names in what Lanxang shows and sends are gone: the new-device alert says "Triage them in Lanxang",
+  the default `name` is `lanxang-node`, `lanxang init` suggests `lanxang@pve`, the report is
+  `reports/lanxang-report.md`, and web requests identify as `lanxang` / `lanxang-uptime`. Code, comments and docs
+  examples use the new name too. Kept on purpose so nothing breaks: the compose project and service names, `atlas.db`,
+  `atlas.*` event types and `atlas_*` metrics, the session cookie and browser storage keys, the `atlas` ntfy tag and
+  webhook `source`, the `atlas.on-demand` label, and the `atlas` default SNMP and fleet user.
 
 ### Security
 - Sign-in: parallel wrong passwords can no longer slip past the five-guess limit, and only a few password checks run

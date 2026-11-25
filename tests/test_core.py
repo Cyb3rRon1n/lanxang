@@ -1,13 +1,13 @@
-from lanxang.core.context import AtlasContext
+from lanxang.core.context import LanxangContext
 from lanxang.core.registry import ModuleRegistry
-from lanxang.core.runtime import AtlasRuntime
+from lanxang.core.runtime import LanxangRuntime
 from lanxang.events import EventBus
-from lanxang.intelligence.context import AtlasEnvironmentContext
+from lanxang.intelligence.context import LanxangEnvironmentContext
 
 
 def test_atlas_context_defaults_are_empty_dicts():
 
-    context = AtlasContext()
+    context = LanxangContext()
 
     assert context.config == {}
     assert context.inventory == {}
@@ -29,8 +29,8 @@ def test_module_registry_register_get_all():
 
 def test_atlas_runtime_wires_context_environment_and_events(isolated_cwd):
 
-    runtime = AtlasRuntime()
+    runtime = LanxangRuntime()
 
-    assert runtime.get_context().config["name"] == "atlas-node"
-    assert isinstance(runtime.get_environment(), AtlasEnvironmentContext)
+    assert runtime.get_context().config["name"] == "lanxang-node"
+    assert isinstance(runtime.get_environment(), LanxangEnvironmentContext)
     assert isinstance(runtime.events, EventBus)

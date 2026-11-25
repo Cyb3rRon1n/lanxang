@@ -119,7 +119,7 @@ def test_home_new_cards_chips_and_chart():
     from datetime import datetime
     html = render_home_page(POSTURE_OK, build_hosts(None, LOCAL, None), [], storage={"rows": [], "state": "ok"},
                             trends=trends, analysis=analysis, now=datetime(2026, 10, 10, 12))
-    assert 'data-ask="What changed today?"' in html and "window.atlasAsk" in html
+    assert 'data-ask="What changed today?"' in html and "window.lanxangAsk" in html
     assert "Security trends" in html and html.count("<rect") > 24 and "28 total" in html
     assert "today 06:00 UTC</time>" in html and "All &lt;fine&gt;" in html and ">Fan<" not in html and " Fan</li>" in html
     assert html.split("<main")[1].count("<li>") == 3   # top 3 recommendations only
@@ -152,16 +152,16 @@ def test_home_attention_lists_new_sign_in_places():
 
 
 def test_getting_started_checklist_until_the_required_steps_are_done():
-    from lanxang.config.models import AtlasConfig
+    from lanxang.config.models import LanxangConfig
     from lanxang.web.home_page import setup_steps
 
     hosts = {"rows": [], "down": [], "state": "unknown"}
-    fresh = setup_steps(AtlasConfig(), [{"state": "new"}, {"state": "new"}, {"state": "known"}])
+    fresh = setup_steps(LanxangConfig(), [{"state": "new"}, {"state": "new"}, {"state": "known"}])
     page = render_home_page(None, hosts, [], steps=fresh)
     assert "Getting started" in page and "2 devices still marked new" in page
     assert 'href="/settings#ntfy"' in page and "(optional)" in page
 
-    config = AtlasConfig(notify={"ntfy": {"url": "https://ntfy.example.org", "topic": "t"}})
+    config = LanxangConfig(notify={"ntfy": {"url": "https://ntfy.example.org", "topic": "t"}})
     done = setup_steps(config, [{"state": "known"}])
     assert [step[3] for step in done] == [True, True, False, False]
     assert "Getting started" not in render_home_page(None, hosts, [], steps=done)   # optional steps don't keep it up

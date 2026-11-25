@@ -18,7 +18,7 @@ All 35 current Lanxang commands. Run `lanxang <command> --help` for any command-
 | Command | Description |
 |---|---|
 | `lanxang discover` | Discover infrastructure information — built-in (system, hardware, storage, network) and every registered plugin — in one pass, and generate inventory. |
-| `lanxang report` | Generate an infrastructure report from the latest inventory. `--json` prints the raw inventory dict instead of writing `reports/atlas-report.md` - `null` if `lanxang discover` hasn't run yet. No exit-code logic, same as `lanxang trends`. |
+| `lanxang report` | Generate an infrastructure report from the latest inventory. `--json` prints the raw inventory dict instead of writing `reports/lanxang-report.md` - `null` if `lanxang discover` hasn't run yet. No exit-code logic, same as `lanxang trends`. |
 | `lanxang docker` | Display Docker container status. |
 | `lanxang services` | Detect known homelab services running in Docker (see [Service Catalog](service-catalog.md)). |
 | `lanxang compose` | Analyze a Docker Compose file. |

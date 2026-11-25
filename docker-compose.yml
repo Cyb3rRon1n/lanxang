@@ -19,7 +19,7 @@ x-lanxang: &lanxang
     dockerfile: Dockerfile
   restart: unless-stopped
   # Optional secrets file next to this compose file (cabling map: SNMP/UniFi passwords).
-  # Keep it chmod 600; atlas never logs or stores these values.
+  # Keep it chmod 600; Lanxang never logs or stores these values.
   env_file:
     - path: .env
       required: false
@@ -31,7 +31,7 @@ x-lanxang: &lanxang
 
 services:
   # Docker access goes through this proxy instead of mounting docker.sock into
-  # atlas (root-equivalent host access). Read-only by default: atlas can list
+  # Lanxang (root-equivalent host access). Read-only by default: Lanxang can list
   # containers, networks and logs, nothing else. LANXANG_DOCKER_WRITE=1 in .env
   # lets the chat's approved stop/restart/resize actions through - the proxy
   # can't narrow writes further, so that is full container control again.
@@ -58,7 +58,7 @@ services:
       DOCKER_HOST: tcp://docker-proxy:2375
     ports:
       # This machine only by default. LANXANG_BIND=0.0.0.0 in .env opens it to the
-      # LAN - atlas asks for its admin password (web.auth: builtin), so that is
+      # LAN - Lanxang asks for its admin password (web.auth: builtin), so that is
       # safe; behind an auth proxy, set web.auth: proxy and keep this on loopback.
       - "${LANXANG_BIND:-127.0.0.1}:${LANXANG_PORT:-8420}:8420"
 
@@ -66,12 +66,12 @@ services:
   # LANXANG_SCAN_MINUTES (default 15). Host networking is what lets it see the
   # LAN's MAC addresses (it reads the host's ARP table); it needs NET_ADMIN
   # only for the posture collector's read-only conntrack listing. Writes the
-  # same database the atlas web container reads.
+  # same database the Lanxang web container reads.
   atlas-scan:
     <<: *lanxang
     network_mode: host
     cap_add:
-      - NET_ADMIN   # conntrack -L only (posture page); atlas never writes netfilter state
+      - NET_ADMIN   # conntrack -L only (posture page); Lanxang never writes netfilter state
     depends_on: [docker-proxy]
     environment:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}

@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
-from lanxang.config.models import AtlasConfig
-from lanxang.intelligence.agent import AtlasAgent
+from lanxang.config.models import LanxangConfig
+from lanxang.intelligence.agent import LanxangAgent
 from lanxang.intelligence.providers.base import (
     AIProvider,
     ChatReply,
@@ -37,7 +37,7 @@ def test_converse_keeps_action_when_target_is_a_known_container():
         action=SuggestedAction(type="restart_container", target="plex")
     )
 
-    agent = AtlasAgent(FakeProvider(reply), AtlasConfig())
+    agent = LanxangAgent(FakeProvider(reply), LanxangConfig())
 
     with patch(
         "lanxang.docker.collect_containers",
@@ -57,7 +57,7 @@ def test_converse_drops_action_for_hallucinated_container():
         action=SuggestedAction(type="restart_container", target="ghost")
     )
 
-    agent = AtlasAgent(FakeProvider(reply), AtlasConfig())
+    agent = LanxangAgent(FakeProvider(reply), LanxangConfig())
 
     with patch(
         "lanxang.docker.collect_containers",
@@ -73,7 +73,7 @@ def test_converse_passes_no_action_through_unchanged():
 
     reply = ChatReply(text="Nothing stands out right now.", action=None)
 
-    agent = AtlasAgent(FakeProvider(reply), AtlasConfig())
+    agent = LanxangAgent(FakeProvider(reply), LanxangConfig())
 
     with patch(
         "lanxang.docker.collect_containers",
@@ -105,7 +105,7 @@ def test_converse_keeps_plan_when_every_step_is_grounded():
         )
     )
 
-    agent = AtlasAgent(FakeProvider(reply), AtlasConfig())
+    agent = LanxangAgent(FakeProvider(reply), LanxangConfig())
 
     with patch(
         "lanxang.docker.collect_containers",
@@ -146,7 +146,7 @@ def test_converse_clears_standalone_action_when_a_plan_is_also_present():
         )
     )
 
-    agent = AtlasAgent(FakeProvider(reply), AtlasConfig())
+    agent = LanxangAgent(FakeProvider(reply), LanxangConfig())
 
     with patch(
         "lanxang.docker.collect_containers",
@@ -181,7 +181,7 @@ def test_converse_drops_entire_plan_when_one_step_is_ungrounded():
         )
     )
 
-    agent = AtlasAgent(FakeProvider(reply), AtlasConfig())
+    agent = LanxangAgent(FakeProvider(reply), LanxangConfig())
 
     with patch(
         "lanxang.docker.collect_containers",
@@ -195,10 +195,10 @@ def test_converse_drops_entire_plan_when_one_step_is_ungrounded():
 
 def test_agent_builds_tools_from_config_once():
 
-    config = AtlasConfig()
+    config = LanxangConfig()
     config.monitoring.enabled = True
 
-    agent = AtlasAgent(FakeProvider(ChatReply(text="ok")), config)
+    agent = LanxangAgent(FakeProvider(ChatReply(text="ok")), config)
 
     assert "get_monitoring" in agent.tools
     assert "get_proxmox_status" not in agent.tools
@@ -212,10 +212,10 @@ def test_live_environment_carries_proxmox_error_for_503_gating():
     only sets when get_proxmox_status's own tool call came back with one.
     """
 
-    config = AtlasConfig()
+    config = LanxangConfig()
     config.proxmox.enabled = True
 
-    agent = AtlasAgent(FakeProvider(ChatReply(text="ok")), config)
+    agent = LanxangAgent(FakeProvider(ChatReply(text="ok")), config)
 
     with patch("lanxang.docker.collect_containers", return_value={"available": True, "containers": []}), \
          patch("lanxang.intelligence.agent.execute_tool", return_value={"error": "Could not reach Proxmox at https://pve:8006."}):
@@ -228,10 +228,10 @@ def test_live_environment_carries_proxmox_error_for_503_gating():
 
 def test_live_environment_omits_error_key_when_proxmox_is_healthy():
 
-    config = AtlasConfig()
+    config = LanxangConfig()
     config.proxmox.enabled = True
 
-    agent = AtlasAgent(FakeProvider(ChatReply(text="ok")), config)
+    agent = LanxangAgent(FakeProvider(ChatReply(text="ok")), config)
 
     with patch("lanxang.docker.collect_containers", return_value={"available": True, "containers": []}), \
          patch("lanxang.intelligence.agent.execute_tool", return_value={"guests": [{"vmid": 100}]}):
@@ -253,7 +253,7 @@ def test_live_environment_grounds_libvirt_guest_restart_action():
     from lanxang.actions import is_action_grounded
     from lanxang.intelligence.providers.base import SuggestedAction
 
-    agent = AtlasAgent(FakeProvider(ChatReply(text="ok")), AtlasConfig())
+    agent = LanxangAgent(FakeProvider(ChatReply(text="ok")), LanxangConfig())
 
     with patch("lanxang.docker.collect_containers", return_value={"available": True, "containers": []}), \
          patch(
@@ -271,7 +271,7 @@ def test_live_environment_grounds_libvirt_guest_restart_action():
 
 def test_live_environment_omits_libvirt_key_when_unavailable():
 
-    agent = AtlasAgent(FakeProvider(ChatReply(text="ok")), AtlasConfig())
+    agent = LanxangAgent(FakeProvider(ChatReply(text="ok")), LanxangConfig())
 
     with patch("lanxang.docker.collect_containers", return_value={"available": True, "containers": []}), \
          patch("lanxang.libvirt.collect_guests", return_value={"available": False, "guests": []}):
@@ -286,10 +286,10 @@ def test_live_environment_keeps_proxmox_guests_grounded_alongside_libvirt():
     from lanxang.actions import is_action_grounded
     from lanxang.intelligence.providers.base import SuggestedAction
 
-    config = AtlasConfig()
+    config = LanxangConfig()
     config.proxmox.enabled = True
 
-    agent = AtlasAgent(FakeProvider(ChatReply(text="ok")), config)
+    agent = LanxangAgent(FakeProvider(ChatReply(text="ok")), config)
 
     with patch("lanxang.docker.collect_containers", return_value={"available": True, "containers": []}), \
          patch("lanxang.intelligence.agent.execute_tool", return_value={"guests": [{"vmid": 100}]}), \

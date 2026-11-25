@@ -157,7 +157,7 @@ def parse_description(xml):
 
 def _fetch(url, timeout):
 
-    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "atlas"}), timeout=timeout) as reply:
+    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "lanxang"}), timeout=timeout) as reply:
         return reply.read(MAX_XML)
 
 

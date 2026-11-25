@@ -11,7 +11,7 @@ CHAT_STYLE = """
   #log { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
   .bubble { padding: 0.6rem 0.9rem; border-radius: 8px; max-width: 80ch; white-space: pre-wrap; }
   .you { align-self: flex-end; background: color-mix(in srgb, var(--accent) 20%, transparent); border: 1px solid var(--accent); }
-  .atlas { align-self: flex-start; background: var(--surface); border: 1px solid var(--line2); }
+  .lanxang { align-self: flex-start; background: var(--surface); border: 1px solid var(--line2); }
   .step { margin: 0.4rem 0; padding: 0.4rem 0.6rem; border: 1px solid var(--line2); border-radius: 6px; }
   .step code { margin-right: 0.5rem; }
   .ok { color: var(--green); } .bad { color: var(--red); }
@@ -101,10 +101,10 @@ function restoreLog() {
   try { JSON.parse(sessionStorage.getItem(LOG_KEY) || "[]").forEach((m) => bubble(m.text, m.who, true)); } catch (error) {}
 }
 
-// Exposed as window.atlasAsk in a real browser (globalThis === window there); globalThis is used
+// Exposed as window.lanxangAsk in a real browser (globalThis === window there); globalThis is used
 // directly so this script also loads cleanly under a bare Node engine with no window global (see
 // tests/test_web_chat_page.py's real-JS-engine test).
-globalThis.atlasAsk = (text) => { setDrawerOpen(true); ask.value = text; ask.focus(); };
+globalThis.lanxangAsk = (text) => { setDrawerOpen(true); ask.value = text; ask.focus(); };
 
 let memorySession = null;
 
@@ -184,9 +184,9 @@ async function sendText(message, useTools = true) {
   status.textContent = "Lanxang is thinking... (a local model can take up to a minute)";
   try {
     const {response, data} = await post("/api/chat", {message, session: getSession(), tools: useTools});
-    if (!response.ok || !data) { bubble(failureText(response, data), "atlas"); return; }
+    if (!response.ok || !data) { bubble(failureText(response, data), "lanxang"); return; }
     setSession(data.session);
-    const reply = bubble(data.text, "atlas");
+    const reply = bubble(data.text, "lanxang");
     if (data.plan) {
       const title = document.createElement("div");
       title.textContent = "Suggested plan: " + data.plan.summary;
@@ -195,7 +195,7 @@ async function sendText(message, useTools = true) {
     } else if (data.action) {
       renderSteps(reply, [{action: data.action, rationale: ""}]);
     }
-  } catch (error) { bubble("Request failed: " + error, "atlas"); }
+  } catch (error) { bubble("Request failed: " + error, "lanxang"); }
   finally { sendButton.disabled = false; newChat.disabled = false; status.textContent = ""; }
 }
 
@@ -210,7 +210,7 @@ async function send() {
 // Send several messages one after another, each awaiting its own reply. A question covering a
 // long list is answered in small batches the local model can actually finish, instead of one
 // turn it runs out of room on. Used by the posture page's "Investigate all".
-globalThis.atlasAskAll = async (texts) => {
+globalThis.lanxangAskAll = async (texts) => {
   setDrawerOpen(true);
   for (const text of texts) { if (text) await sendText(text, false); }
 };

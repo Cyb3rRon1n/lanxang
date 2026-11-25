@@ -1,7 +1,7 @@
 """
 The weekly summary: one message on Sunday evening (notify.timezone) with how the week went - internet outages,
 service uptime, new devices, open alerts, heartbeats, disks. Sent from `lanxang scan` once its time has come, so it
-also tells you atlas itself is alive. Off with notify.weekly_summary: false. Quiet hours hold it like any alert.
+also tells you Lanxang itself is alive. Off with notify.weekly_summary: false. Quiet hours hold it like any alert.
 """
 
 from datetime import date, timedelta

@@ -1,12 +1,12 @@
 import pytest
 from pydantic import ValidationError
 
-from lanxang.config.models import AtlasConfig, WiringConfig
+from lanxang.config.models import LanxangConfig, WiringConfig
 from lanxang.wiring import env_key, is_virtual_mac, normalize_mac
 
 
 def test_wiring_config_defaults_off():
-    config = AtlasConfig()
+    config = LanxangConfig()
     assert config.wiring.enabled is False
     assert config.wiring.switches == [] and config.wiring.unifi.enabled is False
 

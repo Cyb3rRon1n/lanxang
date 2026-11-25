@@ -1,6 +1,6 @@
 import socket
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.discovery.reachability import check_host
 from lanxang.intelligence.tools import build_tools, execute_tool
 from lanxang.knowledge.notes import search_notes
@@ -43,9 +43,9 @@ def test_search_notes_empty_query_and_missing_path(tmp_path):
 
 def test_search_notes_tool_only_offered_when_configured(tmp_path):
 
-    assert "search_notes" not in build_tools(AtlasConfig())
+    assert "search_notes" not in build_tools(LanxangConfig())
 
-    config = AtlasConfig()
+    config = LanxangConfig()
     config.knowledge.notes_paths = [str(_notes(tmp_path))]
     tools = build_tools(config)
 
@@ -84,7 +84,7 @@ def test_check_host_unresolvable_name_and_port_cap():
 
 def test_check_host_is_always_offered():
 
-    assert "check_host" in build_tools(AtlasConfig())
+    assert "check_host" in build_tools(LanxangConfig())
 
 
 def test_search_notes_keeps_scripts_whole(tmp_path):

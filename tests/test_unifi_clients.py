@@ -1,4 +1,4 @@
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.devices import Sighting
 from lanxang.devices import identify
 from lanxang.devices.store import InventoryStore
@@ -34,7 +34,7 @@ def test_every_client_is_kept_with_wifi_details():
 def test_wiring_scan_links_unifi_clients_to_devices_by_mac(temp_db, tmp_path):
     inventory = InventoryStore(temp_db)
     inventory.record_run("lan", [Sighting("lan", "02:00:00:00:00:41", ip="192.0.2.41", mac="02:00:00:00:00:41")])
-    settings = AtlasConfig(wiring={"enabled": True, "cabling_file": str(tmp_path / "cabling.yaml"),
+    settings = LanxangConfig(wiring={"enabled": True, "cabling_file": str(tmp_path / "cabling.yaml"),
                                    "unifi": {"enabled": True, "url": "https://192.0.2.1"}})
     run_scan(settings, WiringStore(temp_db), [], env={}, fetch=lambda *a, **k: parse_unifi([AP], CLIENTS))
     devices = {d["ip"]: d for d in inventory.devices()}

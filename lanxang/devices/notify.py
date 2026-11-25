@@ -39,7 +39,7 @@ def format_message(kind, items, display=None):
 
     lines = ["**🆕 New device on the network**" if len(items) == 1 else f"**🆕 {len(items)} new devices on the network**"]
     lines += [_line(item) for item in items]
-    lines += ["", "Triage them in atlas."]
+    lines += ["", "Triage them in Lanxang."]
 
     return "\n".join(lines)
 

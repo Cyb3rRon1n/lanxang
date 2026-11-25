@@ -3,7 +3,7 @@ def host_metric_trend(records, metric_name):
     records is KnowledgeQueries.environment_history()'s most-recent-
     first result. Returns chronological (oldest-first) (created_at,
     value) pairs, skipping any row with no monitoring data at all
-    (e.g. a discover- or proxmox-scan-only row, since each atlas
+    (e.g. a discover- or proxmox-scan-only row, since each Lanxang
     invocation only saves whatever it itself discovered) or where
     this metric is None.
     """

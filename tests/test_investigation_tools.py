@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.discovery.host_health import get_host_health
 from lanxang.intelligence.tools import build_tools, execute_tool
 
@@ -53,7 +53,7 @@ def fake_server():
 
 def _jellyfin_tools(url):
 
-    config = AtlasConfig()
+    config = LanxangConfig()
     config.jellyfin.enabled = True
     config.jellyfin.url = url
     config.jellyfin.api_key = "K"
@@ -62,7 +62,7 @@ def _jellyfin_tools(url):
 
 def test_jellyfin_tools_only_when_enabled():
 
-    assert not {"get_jellyfin_sessions", "get_jellyfin_activity", "get_jellyfin_plugins"} & set(build_tools(AtlasConfig()))
+    assert not {"get_jellyfin_sessions", "get_jellyfin_activity", "get_jellyfin_plugins"} & set(build_tools(LanxangConfig()))
 
 
 def test_jellyfin_sessions_show_play_method(fake_server):
@@ -86,7 +86,7 @@ def test_jellyfin_activity_search_and_plugins_with_config(fake_server):
 
 def test_jellyfin_bad_key_is_a_tool_error_not_a_crash(fake_server):
 
-    config = AtlasConfig()
+    config = LanxangConfig()
     config.jellyfin.enabled, config.jellyfin.url, config.jellyfin.api_key = True, fake_server, "wrong"
 
     assert "error" in execute_tool(build_tools(config), "get_jellyfin_sessions", {})
@@ -121,7 +121,7 @@ def test_search_container_logs_counts_and_keeps_most_recent():
     client, container = _container_with_logs(lines)
 
     with patch("lanxang.docker.manager.get_client", return_value=client):
-        result = execute_tool(build_tools(AtlasConfig()), "search_container_logs",
+        result = execute_tool(build_tools(LanxangConfig()), "search_container_logs",
                               {"container": "jellyfin", "pattern": "killing TRANSCODE", "since_minutes": 60})
 
     assert result["total_matches"] == 30

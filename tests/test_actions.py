@@ -54,7 +54,7 @@ def test_known_guest_ids_empty_when_no_virtualization_key():
 
 def test_known_guest_ids_unaffected_by_extra_error_key():
     """
-    AtlasAgent._live_environment() adds environment["virtualization"]["error"]
+    LanxangAgent._live_environment() adds environment["virtualization"]["error"]
     when a Proxmox tool call fails - known_guest_ids() must keep reading just
     "guests" and ignore the extra key rather than choke on it.
     """

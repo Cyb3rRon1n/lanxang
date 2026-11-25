@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from lanxang.config.models import AtlasConfig, NasConfig
+from lanxang.config.models import LanxangConfig, NasConfig
 from lanxang.monitoring import nas
 from lanxang.web.home_page import build_storage
 
@@ -124,7 +124,7 @@ def test_pool_alerts_once_disk_alerts_and_read_errors_keep_state(temp_db):
     from lanxang.posture.store import PostureStore
 
     store, sent = PostureStore(temp_db), []
-    settings = AtlasConfig(nas=_config(name="nas"))
+    settings = LanxangConfig(nas=_config(name="nas"))
     t = datetime(2026, 11, 17, 9)
 
     def info(health, disk_health="PASSED"):
@@ -160,7 +160,7 @@ def test_a_failed_read_keeps_a_bad_pool_open(temp_db):
     from lanxang.posture.store import PostureStore
 
     store, t = PostureStore(temp_db), datetime(2026, 11, 17, 9)
-    settings = AtlasConfig(nas=_config(name="nas"))
+    settings = LanxangConfig(nas=_config(name="nas"))
     bad = lambda c: {"kind": "TrueNAS", "pools": [{"name": "tank", "health": "DEGRADED", "size": 10, "alloc": 5}],
                      "disks": []}
 

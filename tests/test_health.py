@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import requests
 
 from lanxang.config.models import (
-    AtlasConfig,
+    LanxangConfig,
     IntelligenceConfig,
     MonitoringConfig,
     ProxmoxConfig,
@@ -83,7 +83,7 @@ def test_check_inventory_false_when_missing(isolated_cwd):
 
 def test_check_proxmox_healthy_when_disabled():
 
-    result = check_proxmox(AtlasConfig())
+    result = check_proxmox(LanxangConfig())
 
     assert result["status"] is True
     assert result["details"] == "disabled"
@@ -91,7 +91,7 @@ def test_check_proxmox_healthy_when_disabled():
 
 def test_check_proxmox_unhealthy_when_enabled_without_credentials():
 
-    config = AtlasConfig(
+    config = LanxangConfig(
         proxmox=ProxmoxConfig(enabled=True, host="192.168.1.10")
     )
 
@@ -102,7 +102,7 @@ def test_check_proxmox_unhealthy_when_enabled_without_credentials():
 
 def test_check_proxmox_healthy_when_enabled_and_reachable():
 
-    config = AtlasConfig(
+    config = LanxangConfig(
         proxmox=ProxmoxConfig(
             enabled=True,
             host="192.168.1.10",
@@ -124,7 +124,7 @@ def test_check_proxmox_healthy_when_enabled_and_reachable():
 
 def test_check_proxmox_unhealthy_when_enabled_but_unreachable():
 
-    config = AtlasConfig(
+    config = LanxangConfig(
         proxmox=ProxmoxConfig(
             enabled=True,
             host="192.168.1.10",
@@ -148,7 +148,7 @@ def test_check_intelligence_unhealthy_without_api_key(monkeypatch):
 
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
 
-    config = AtlasConfig(
+    config = LanxangConfig(
         intelligence=IntelligenceConfig(provider="anthropic")
     )
 
@@ -161,7 +161,7 @@ def test_check_intelligence_healthy_with_api_key(monkeypatch):
 
     monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test")
 
-    config = AtlasConfig(
+    config = LanxangConfig(
         intelligence=IntelligenceConfig(provider="anthropic")
     )
 
@@ -174,7 +174,7 @@ def test_check_intelligence_healthy_for_ollama_when_reachable(monkeypatch):
 
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
 
-    config = AtlasConfig(
+    config = LanxangConfig(
         intelligence=IntelligenceConfig(provider="ollama")
     )
 
@@ -192,7 +192,7 @@ def test_check_intelligence_unhealthy_for_ollama_when_unreachable(monkeypatch):
 
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
 
-    config = AtlasConfig(
+    config = LanxangConfig(
         intelligence=IntelligenceConfig(provider="ollama")
     )
 
@@ -208,7 +208,7 @@ def test_check_intelligence_unhealthy_for_ollama_when_unreachable(monkeypatch):
 
 def test_check_monitoring_healthy_when_disabled():
 
-    result = check_monitoring(AtlasConfig())
+    result = check_monitoring(LanxangConfig())
 
     assert result["status"] is True
     assert result["details"] == "disabled"
@@ -216,7 +216,7 @@ def test_check_monitoring_healthy_when_disabled():
 
 def test_check_monitoring_healthy_when_enabled_and_reachable():
 
-    config = AtlasConfig(
+    config = LanxangConfig(
         monitoring=MonitoringConfig(
             enabled=True, prometheus_url="http://localhost:9090"
         )
@@ -234,7 +234,7 @@ def test_check_monitoring_healthy_when_enabled_and_reachable():
 
 def test_check_monitoring_unhealthy_when_enabled_but_unreachable():
 
-    config = AtlasConfig(
+    config = LanxangConfig(
         monitoring=MonitoringConfig(
             enabled=True, prometheus_url="http://localhost:9090"
         )

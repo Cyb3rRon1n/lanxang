@@ -1,5 +1,5 @@
 """
-The web chat: the same AtlasAgent as `lanxang chat`, behind /api/chat, with
+The web chat: the same LanxangAgent as `lanxang chat`, behind /api/chat, with
 in-memory per-browser sessions, plus Approve, which executes exactly one
 suggested step after re-grounding it against live state. Pure of HTTP:
 callers pass factories, so tests never touch an LLM or Docker.
@@ -14,7 +14,7 @@ import docker
 
 from lanxang.actions import ACTIONS, PLAN_STEP_EVENT_TYPES, execute_action, is_action_grounded
 from lanxang.core.application import application
-from lanxang.events import AtlasEvent
+from lanxang.events import LanxangEvent
 from lanxang.intelligence.providers.base import AIProviderError, SuggestedAction
 
 
@@ -29,7 +29,7 @@ ACTION_FIELDS = ("type", "target", "cpus", "memory")
 def _publish(event_type, payload):
 
     try:
-        application.runtime.events.publish(AtlasEvent(event_type=event_type, source="AtlasWeb", payload=payload))
+        application.runtime.events.publish(LanxangEvent(event_type=event_type, source="LanxangWeb", payload=payload))
 
     except Exception as error:  # the action/answer already happened; a logging failure must not hide it
         print(f"lanxang web: could not record {event_type}: {error}")
@@ -106,7 +106,7 @@ def chat_turn(sessions, session_id, message, agent_factory, now=None, tools=True
         messages = list(session["messages"]) + [{"role": "user", "content": message}]
 
     # The LLM call happens outside the lock: it can take 10-30 s and must not block other sessions.
-    # A copy is passed in: AtlasAgent.converse() may hand the provider a *different* list
+    # A copy is passed in: LanxangAgent.converse() may hand the provider a *different* list
     # (e.g. _with_notes() copies when notes are configured) and only that copy ever gets the
     # assistant reply appended to it - messages here must never be relied on to have been
     # mutated. The assistant turn is added explicitly below instead, as a plain dict.

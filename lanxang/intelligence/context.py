@@ -1,7 +1,7 @@
 from lanxang.clock import utcnow
 
 
-class AtlasEnvironmentContext:
+class LanxangEnvironmentContext:
     """
     Represents Lanxang' current understanding
     of an environment.

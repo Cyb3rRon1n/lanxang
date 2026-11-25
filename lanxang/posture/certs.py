@@ -1,6 +1,6 @@
 """
 Certificate watch (lanxang certs check -> Posture page, Public exposure tab): once a day, opens a
-TLS connection to every public hostname - the Traefik routes atlas already reads plus
+TLS connection to every public hostname - the Traefik routes Lanxang already reads plus
 security.cert_hosts - the way a browser would, and reads the certificate's expiry date.
 
 Levels per host: ok, soon (cert_warn_days or fewer left), urgent (cert_urgent_days or fewer, or

@@ -43,11 +43,11 @@ MAKERS = {"0C1001": "Apple, Inc.", "0C1002": "Samsung Electronics Co.,Ltd", "0C1
 
 from lanxang.alerts import AlertStore                                   # noqa: E402 (after the chdir)
 from lanxang.clock import utcnow                                        # noqa: E402
-from lanxang.config.models import AtlasConfig                           # noqa: E402
+from lanxang.config.models import LanxangConfig                           # noqa: E402
 from lanxang.devices import Sighting                                    # noqa: E402
 from lanxang.devices.store import InventoryStore                        # noqa: E402
-from lanxang.events import AtlasEvent                                   # noqa: E402
-from lanxang.intelligence.context import AtlasEnvironmentContext        # noqa: E402
+from lanxang.events import LanxangEvent                                   # noqa: E402
+from lanxang.intelligence.context import LanxangEnvironmentContext        # noqa: E402
 from lanxang.knowledge.store import KnowledgeStore                      # noqa: E402
 from lanxang.monitoring import nas, ups                                 # noqa: E402
 from lanxang.monitoring.uptime import UptimeStore                       # noqa: E402
@@ -56,7 +56,7 @@ from lanxang.wiring.scan import run_scan                                # noqa: 
 from lanxang.wiring.store import WiringStore                            # noqa: E402
 from lanxang.wiring.unifi import parse_unifi, sightings                 # noqa: E402
 
-settings = AtlasConfig.model_validate(__import__("yaml").safe_load((DIR / "lanxang.yaml").read_text()))
+settings = LanxangConfig.model_validate(__import__("yaml").safe_load((DIR / "lanxang.yaml").read_text()))
 now = utcnow()
 
 
@@ -139,12 +139,12 @@ while not DEGRADED and tick < now - timedelta(minutes=45):    # ~50 s; the degra
         inventory.record_run("unifi", seen_by_unifi, now=tick)
     inventory.record_run("proxmox", guests, now=tick)
     hours = (tick - now).total_seconds() / 3600
-    KnowledgeStore().save_event(AtlasEvent("atlas.host.sample", "HostSample", {
+    KnowledgeStore().save_event(LanxangEvent("atlas.host.sample", "HostSample", {
         "cpu": round(8 + 6 * (tick.hour in range(18, 23)) + k % 5, 1), "mem": round(41 + k % 7 / 2, 1),
         "disk": round(37 + hours / 168, 1), "temp": 46 + k % 4, "storage": {"tank": round(43.75 + hours / 336, 2)}},
         timestamp=tick))
     if tick.minute == 0:
-        KnowledgeStore().save_event(AtlasEvent("atlas.proxmox.scan.completed", "proxmox", {"nodes": [
+        KnowledgeStore().save_event(LanxangEvent("atlas.proxmox.scan.completed", "proxmox", {"nodes": [
             {"name": "pve1", "status": "online", "cpu": 0.05 + k % 4 / 100, "mem": (16 + k % 3) * 2**30,
              "maxmem": 64 * 2**30, "disk": round((310 + hours / 24) * 2**30), "maxdisk": 960 * 2**30,
              "zfs": [{"name": "rpool", "health": "ONLINE", "size": 1800 * 10**9, "alloc": round((620 + hours / 6) * 10**9)}]}]},
@@ -174,7 +174,7 @@ for device in inventory.devices():                    # the owner named and type
         inventory.set_fields(device["id"], {"state": "known"})
 
 # What the map and a Proxmox scan would have saved.
-environment = AtlasEnvironmentContext()
+environment = LanxangEnvironmentContext()
 environment.update("topology", {
     "host": "homeserver",
     "docker": {"available": True, "networks": {"apps": [{"name": n, "status": "running", "health": "healthy"} for n in (
@@ -184,7 +184,7 @@ environment.update("topology", {
     "lan": [{"name": name, "address": f"192.0.2.{octet}", "reachable": octet != 30}
             for octet, name, _, _, _, _ in DEVICES[:13]]})
 KnowledgeStore().save_environment(environment)
-KnowledgeStore().save_event(AtlasEvent("atlas.proxmox.scan.completed", "proxmox", {"nodes": [
+KnowledgeStore().save_event(LanxangEvent("atlas.proxmox.scan.completed", "proxmox", {"nodes": [
     {"name": "pve1", "status": "online", "cpu": 0.07, "mem": 17 * 2**30, "maxmem": 64 * 2**30,
      "disk": 310 * 2**30, "maxdisk": 960 * 2**30,
      "zfs": [{"name": "rpool", "health": "ONLINE", "size": 1800 * 10**9, "alloc": 620 * 10**9}]}]}))
@@ -222,7 +222,7 @@ for minutes, event_type, payload in ((300, "atlas.proxmox.changes_detected", {"c
                                          {"type": "container_metric_crossed", "container": "photos",
                                           "metric": "memory"}]}),
                                      (40, "atlas.devices.updated", {"name": "kitchen-speaker"})):
-    KnowledgeStore().save_event(AtlasEvent(event_type, "demo", payload))
+    KnowledgeStore().save_event(LanxangEvent(event_type, "demo", payload))
 
 printer = next(d for d in inventory.devices() if d["ip"] == "192.0.2.30")
 AlertStore().sync("devices", [{"key": "offline:printer", "title": "Printer is offline", "level": "problem",

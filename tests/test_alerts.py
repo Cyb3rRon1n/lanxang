@@ -60,12 +60,12 @@ def test_page_and_home_show_the_same_problems(temp_db):
 
 
 def test_cabling_scan_reports_into_alerts(temp_db):
-    from lanxang.config.models import AtlasConfig
+    from lanxang.config.models import LanxangConfig
     from lanxang.wiring import WiringError
     from lanxang.wiring.scan import run_scan
     from lanxang.wiring.store import WiringStore
 
-    settings = AtlasConfig(wiring={"enabled": True, "switches": [{"name": "sw1", "host": "192.0.2.2"}]})
+    settings = LanxangConfig(wiring={"enabled": True, "switches": [{"name": "sw1", "host": "192.0.2.2"}]})
 
     def broken(switch, env, timeout):
         raise WiringError("sw1: no answer from 192.0.2.2")
@@ -108,12 +108,12 @@ def test_ack_mute_pause_and_allowed(temp_db):
 
 
 def test_a_muted_problem_is_listed_but_not_sent(temp_db):
-    from lanxang.config.models import AtlasConfig
+    from lanxang.config.models import LanxangConfig
     from lanxang.devices import lanwatch
     from lanxang.posture.store import PostureStore
 
     posture = PostureStore(temp_db)
-    settings = AtlasConfig()
+    settings = LanxangConfig()
     arp = "IP address       HW type     Flags       HW address            Mask     Device\n" \
           "192.0.2.1        0x1         0x2         aa:aa:aa:aa:aa:01     *        eth0\n"
     route = "Iface\tDestination\tGateway\tFlags\n eth0\t00000000\t010200C0\t0003\n"

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import pytest
 from pydantic import ValidationError
 
-from lanxang.config.models import AtlasConfig, NotifyConfig
+from lanxang.config.models import LanxangConfig, NotifyConfig
 from lanxang.monitoring import summary
 
 NOW = datetime(2026, 11, 19, 13, 30)                       # 08:30 in New York
@@ -40,7 +40,7 @@ def test_daily_due_once_per_local_day():
 
 
 def test_build_daily_lists_changes():
-    text, quiet = summary.build_daily(AtlasConfig(), NOW, _sources(NOW), [])
+    text, quiet = summary.build_daily(LanxangConfig(), NOW, _sources(NOW), [])
     assert text.startswith("**📋 Lanxang: yesterday**")
     for part in ("New device: Den TV (192.0.2.20)", "Printer is offline", "Cleared: Backup is late",
                  "Route added: photos.example.org", "Gone quiet: nas"):
@@ -55,7 +55,7 @@ def test_build_daily_lists_an_internet_view_alert():
     same = [{"name": "media", "hosts": ["media.example.org"]}]
     sources = _sources(NOW, routes_then=same, routes_now=same, devices=[],
                        alerts={"open": [], "watch": [], "resolved": [row]})
-    text, _ = summary.build_daily(AtlasConfig(), NOW, sources, [])
+    text, _ = summary.build_daily(LanxangConfig(), NOW, sources, [])
     assert "Port 22 is open to the internet" in text and "Cleared: Port 22 is open to the internet" in text
 
 
@@ -63,23 +63,23 @@ def test_build_daily_quiet_day_returns_none():
     same = [{"name": "media", "hosts": ["media.example.org"]}]
     sources = _sources(NOW, routes_then=same, routes_now=same, alerts={"open": [], "watch": [], "resolved": []},
                        devices=[{"id": 2, "name": "nas", "state": "known", "status": "quiet", "sightings": []}])
-    assert summary.build_daily(AtlasConfig(), NOW, sources, [2]) == (None, [2])
-    assert summary.build_daily(AtlasConfig(), NOW, sources, None) == (None, [2])    # first run: baseline
+    assert summary.build_daily(LanxangConfig(), NOW, sources, [2]) == (None, [2])
+    assert summary.build_daily(LanxangConfig(), NOW, sources, None) == (None, [2])    # first run: baseline
 
 
 def test_build_daily_skips_routes_without_an_old_snapshot():
     sources = _sources(NOW, routes_then=[], alerts={"open": [], "watch": [], "resolved": []}, devices=[])
-    assert summary.build_daily(AtlasConfig(), NOW, sources, [])[0] is None
+    assert summary.build_daily(LanxangConfig(), NOW, sources, [])[0] is None
 
 
 def test_run_daily_respects_quiet_hours_and_off(temp_db, isolated_cwd):
     from lanxang.posture.store import PostureStore
 
     store, sent = PostureStore(temp_db), []
-    off = AtlasConfig(notify={"timezone": "America/New_York"})
+    off = LanxangConfig(notify={"timezone": "America/New_York"})
     assert summary.run_daily(off, store, NOW, send=sent.append, sources=_sources(NOW)) is None
 
-    on = AtlasConfig(notify={"timezone": "America/New_York", "daily_summary": "08:00"})
+    on = LanxangConfig(notify={"timezone": "America/New_York", "daily_summary": "08:00"})
     (isolated_cwd / "lanxang.yaml").write_text(
         "notify:\n  timezone: America/New_York\n  quiet_hours:\n    - {start: '07:00', end: '09:00'}\n")
     assert summary.run_daily(on, store, NOW, send=sent.append, sources=_sources(NOW)) is None
@@ -97,7 +97,7 @@ def test_run_daily_records_a_quiet_day_without_sending(temp_db, isolated_cwd):
     from lanxang.posture.store import PostureStore
 
     store, sent = PostureStore(temp_db), []
-    on = AtlasConfig(notify={"daily_summary": "08:00"})
+    on = LanxangConfig(notify={"daily_summary": "08:00"})
     same = [{"name": "media", "hosts": ["media.example.org"]}]
     sources = _sources(NOW, routes_then=same, routes_now=same, alerts={"open": [], "watch": [], "resolved": []},
                        devices=[])
@@ -110,7 +110,7 @@ def test_run_daily_drops_a_quiet_baseline_from_weeks_ago(temp_db, isolated_cwd):
     from lanxang.posture.store import PostureStore
 
     store, sent = PostureStore(temp_db), []
-    on = AtlasConfig(notify={"daily_summary": "08:00"})
+    on = LanxangConfig(notify={"daily_summary": "08:00"})
     same = [{"name": "media", "hosts": ["media.example.org"]}]
     nas = [{"id": 2, "name": "nas", "state": "known", "status": "quiet", "sightings": []}]
     store.set_status("summary_daily", True, {"sent_at": None, "date": "2026-10-01", "quiet": []}, NOW)

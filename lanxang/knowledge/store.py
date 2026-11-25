@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from lanxang.database import initialize_database
 from lanxang.database.engine import engine
 from lanxang.database.models import EventRecord, EnvironmentRecord, AnalysisRecord
-from lanxang.events import AtlasEvent
+from lanxang.events import LanxangEvent
 from lanxang.intelligence.providers import AnalysisResult
 from lanxang.clock import utcnow
 
@@ -26,7 +26,7 @@ class KnowledgeStore:
 
     def save_event(
         self,
-        event: AtlasEvent
+        event: LanxangEvent
     ):
 
         initialize_database(engine)

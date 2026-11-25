@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.monitoring import summary
 
 SUNDAY_EVENING = datetime(2026, 11, 15, 23, 30)            # 18:30 in Detroit
@@ -20,7 +20,7 @@ def _sources(now):
 
 
 def test_the_week_in_short_lines():
-    settings = AtlasConfig(uptime={"checks": [{"name": "Media", "target": "https://m.example.org"},
+    settings = LanxangConfig(uptime={"checks": [{"name": "Media", "target": "https://m.example.org"},
                                               {"name": "Photos", "target": "https://p.example.org"}]})
     text = summary.build(settings, SUNDAY_EVENING, _sources(SUNDAY_EVENING))
     assert text.startswith("**📋 Lanxang: your week**")
@@ -42,10 +42,10 @@ def test_run_sends_once_and_can_be_turned_off(temp_db, isolated_cwd):
     from lanxang.posture.store import PostureStore
 
     store, sent = PostureStore(temp_db), []
-    settings = AtlasConfig(notify={"timezone": "America/Detroit"})
+    settings = LanxangConfig(notify={"timezone": "America/Detroit"})
     for minutes in (0, 15, 30):
         summary.run(settings, store, SUNDAY_EVENING + timedelta(minutes=minutes), send=sent.append,
                     sources=_sources(SUNDAY_EVENING))
     assert len(sent) == 1 and sent[0].key == "summary:weekly"
-    off = AtlasConfig(notify={"timezone": "America/Detroit", "weekly_summary": False})
+    off = LanxangConfig(notify={"timezone": "America/Detroit", "weekly_summary": False})
     assert summary.run(off, PostureStore(temp_db), SUNDAY_EVENING + timedelta(days=7), send=sent.append) is None

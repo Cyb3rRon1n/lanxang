@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from lanxang.events.event import AtlasEvent
+from lanxang.events.event import LanxangEvent
 
 
 class EventBus:
@@ -26,7 +26,7 @@ class EventBus:
 
     def publish(
         self,
-        event: AtlasEvent
+        event: LanxangEvent
     ):
 
         listeners = (

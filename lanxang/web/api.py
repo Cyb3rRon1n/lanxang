@@ -3,7 +3,7 @@ The inventory's JSON API for lanxang web: plain (status, payload) results,
 so the HTTP layer (server.py) owns sockets and headers and this module
 owns only routing, validation mapping and events. Writes go through
 InventoryStore, and every successful one is published as an event, the
-same persistence path as every other atlas state change.
+same persistence path as every other Lanxang state change.
 """
 
 import re
@@ -15,8 +15,8 @@ from lanxang.config.local import config_name
 from lanxang.config import load_config
 from lanxang.core.application import application
 from lanxang.devices.store import InventoryStore
-from lanxang.events import AtlasEvent
-from lanxang.intelligence.agent import AtlasAgent
+from lanxang.events import LanxangEvent
+from lanxang.intelligence.agent import LanxangAgent
 from lanxang.intelligence.providers import get_provider
 from lanxang.knowledge.queries import KnowledgeQueries
 from lanxang.posture.model import WINDOWS, build_posture, node_details
@@ -45,12 +45,12 @@ def _agent():
 
     settings = load_config()
 
-    return AtlasAgent(get_provider(settings.intelligence), settings)
+    return LanxangAgent(get_provider(settings.intelligence), settings)
 
 
 def _environment():
 
-    return AtlasAgent(None, load_config())._live_environment()
+    return LanxangAgent(None, load_config())._live_environment()
 
 
 def _safe_environment():
@@ -72,7 +72,7 @@ def _result(result, event_type, payload):
         return 400, {"error": result["error"]}
 
     try:
-        application.runtime.events.publish(AtlasEvent(event_type=event_type, source="AtlasWeb", payload=payload))
+        application.runtime.events.publish(LanxangEvent(event_type=event_type, source="LanxangWeb", payload=payload))
     except Exception as error:
         # The store change already committed - a broken event listener shouldn't turn
         # a successful write into an error response the caller would wrongly retry.
@@ -133,7 +133,7 @@ def _post(path, body):
             return 400, {"error": result["error"]}
 
         try:
-            application.runtime.events.publish(AtlasEvent(event_type="atlas.posture.marked_known", source="AtlasWeb",
+            application.runtime.events.publish(LanxangEvent(event_type="atlas.posture.marked_known", source="LanxangWeb",
                                                            payload={"source": body["source"], "asn_key": body["asn_key"]}))
         except Exception as error:
             print(f"lanxang.web.api: event publish failed for atlas.posture.marked_known: {error!r}", file=sys.stderr)
@@ -152,7 +152,7 @@ def _post(path, body):
             return 400, {"error": result["error"]}
 
         try:
-            application.runtime.events.publish(AtlasEvent(event_type="atlas.access.place_confirmed", source="AtlasWeb",
+            application.runtime.events.publish(LanxangEvent(event_type="atlas.access.place_confirmed", source="LanxangWeb",
                                                            payload={"user": body["user"], "place_key": body["place_key"]}))
         except Exception as error:
             print(f"lanxang.web.api: event publish failed for atlas.access.place_confirmed: {error!r}", file=sys.stderr)
@@ -246,8 +246,8 @@ def _wiring_refresh():
 
     snapshot = result["snapshot"]
     try:
-        application.runtime.events.publish(AtlasEvent(
-            event_type="atlas.wiring.scanned", source="AtlasWeb",
+        application.runtime.events.publish(LanxangEvent(
+            event_type="atlas.wiring.scanned", source="LanxangWeb",
             payload={"links": len(snapshot["links"]), "warnings": len(snapshot["warnings"]),
                      "sources": {name: source["ok"] for name, source in result["sources"].items()}}))
     except Exception as error:

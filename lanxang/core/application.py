@@ -1,14 +1,14 @@
-from lanxang.core.runtime import AtlasRuntime
+from lanxang.core.runtime import LanxangRuntime
 
 
-class AtlasApplication:
+class LanxangApplication:
     """
     Main Lanxang application container.
     """
 
     def __init__(self):
 
-        self.runtime = AtlasRuntime()
+        self.runtime = LanxangRuntime()
 
 
-application = AtlasApplication()
+application = LanxangApplication()

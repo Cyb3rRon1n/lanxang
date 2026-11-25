@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ElementTree
 from datetime import datetime
 from types import SimpleNamespace
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.devices import ports as ports_module
 from lanxang.devices.ports import assess, host_listeners, port_label, probe, run, upnp_mappings
 from lanxang.posture.model import build_posture
@@ -131,10 +131,10 @@ def test_run_end_to_end_and_pages(temp_db):
     opened = {("192.0.2.20", 80)}
     kwargs = dict(read=files(["192.0.2.20", "192.0.2.5"]), check=lambda ip, port, t: (ip, port) in opened,
                   listeners=lambda: [22], upnp=lambda gw: None, local_ips=lambda: {"192.0.2.5"}, send=sent.append)
-    texts, state = run(AtlasConfig(), store, devices, NOW, **kwargs)
+    texts, state = run(LanxangConfig(), store, devices, NOW, **kwargs)
     assert texts == [] and state["probed"] == 1 and set(state["devices"]) == {"7"}
     opened.add(("192.0.2.20", 23))
-    texts, state = run(AtlasConfig(), store, devices, NOW, **kwargs)
+    texts, state = run(LanxangConfig(), store, devices, NOW, **kwargs)
     assert len(sent) == 1 and "telnet" in sent[0] and state["recent"][0]["at"] == "2026-11-15T12:00"
 
     router = build_posture(store, NOW)["router"]
@@ -145,5 +145,5 @@ def test_run_end_to_end_and_pages(temp_db):
 
 
 def test_port_watch_can_be_turned_off_via_config():
-    assert AtlasConfig(security={"port_watch": False}).security.port_watch is False
+    assert LanxangConfig(security={"port_watch": False}).security.port_watch is False
     assert ports_module.RECENT_MAX >= 8

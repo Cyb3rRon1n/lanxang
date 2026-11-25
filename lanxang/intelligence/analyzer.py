@@ -2,7 +2,7 @@ from lanxang.actions import is_action_grounded
 from lanxang.intelligence.providers import AIProvider, AnalysisResult
 
 
-class AtlasAnalyzer:
+class LanxangAnalyzer:
     """
     Runs an environment snapshot through an AI provider
     to produce a summary and recommendations.

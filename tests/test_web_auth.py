@@ -9,7 +9,7 @@ from http.server import ThreadingHTTPServer
 import pytest
 
 from lanxang.web.auth import MAX_FAILS, SESSION_SECONDS, Auth, check_password, hash_password
-from lanxang.web.server import AtlasWebHandler, safe_next
+from lanxang.web.server import LanxangWebHandler, safe_next
 
 
 def test_password_hash_round_trip_and_salted():
@@ -106,7 +106,7 @@ def _call(url, data=None, headers=None):
 def secured(temp_db, tmp_path):
 
     auth = Auth(tmp_path / "auth.json")
-    handler = type("Handler", (AtlasWebHandler,), {"auth": auth})
+    handler = type("Handler", (LanxangWebHandler,), {"auth": auth})
     httpd = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
     thread.start()
@@ -206,7 +206,7 @@ def test_proxy_mode_is_unchanged(running_server_open):
 @pytest.fixture
 def running_server_open(temp_db):
 
-    httpd = ThreadingHTTPServer(("127.0.0.1", 0), AtlasWebHandler)
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), LanxangWebHandler)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
     thread.start()
 
@@ -305,7 +305,7 @@ def test_forwarded_header_only_counts_from_a_trusted_proxy(secured):
         return _call(base + "/login", fields, {"Origin": base, "X-Forwarded-For": visitor,
                                                "Content-Type": "application/x-www-form-urlencoded"})[0]
 
-    handler = type("Handler", (AtlasWebHandler,), {"client_address": ("192.168.1.50", 1)})
+    handler = type("Handler", (LanxangWebHandler,), {"client_address": ("192.168.1.50", 1)})
     fake = handler.__new__(handler)
     fake.headers = {"X-Forwarded-For": "10.9.9.9"}
     assert fake._client() == "192.168.1.50"          # a LAN visitor can't pick its own bucket

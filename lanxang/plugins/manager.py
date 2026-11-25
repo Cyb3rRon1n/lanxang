@@ -1,6 +1,6 @@
-from lanxang.plugins.base import AtlasPlugin
+from lanxang.plugins.base import LanxangPlugin
 from lanxang.plugins.loader import discover_plugins
-from lanxang.events import AtlasEvent
+from lanxang.events import LanxangEvent
 
 
 class PluginManager:
@@ -11,7 +11,7 @@ class PluginManager:
     def __init__(self):
         self._plugins = []
 
-    def register(self, plugin: AtlasPlugin):
+    def register(self, plugin: LanxangPlugin):
         self._plugins.append(plugin)
 
     def initialize(self, runtime):
@@ -26,7 +26,7 @@ class PluginManager:
             plugin.initialize(runtime)
 
             runtime.events.publish(
-                AtlasEvent(
+                LanxangEvent(
                     event_type="atlas.plugin.loaded",
                     source="PluginManager",
                     payload={

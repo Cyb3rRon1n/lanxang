@@ -1,7 +1,7 @@
 import copy
 from datetime import datetime, timedelta
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.web.cabling_page import render_cabling_page
 from lanxang.wiring import traffic
 from lanxang.wiring.scan import run_scan
@@ -31,7 +31,7 @@ def test_rates_are_bits_per_second_and_skip_resets_and_stale():
 
 def test_scan_puts_load_on_the_cable_and_keeps_a_week(temp_db, tmp_path):
 
-    settings = AtlasConfig(wiring={"enabled": True, "cabling_file": str(tmp_path / "cabling.yaml"),
+    settings = LanxangConfig(wiring={"enabled": True, "cabling_file": str(tmp_path / "cabling.yaml"),
                                    "switches": [{"name": "core-switch", "host": "192.0.2.2"}]})
     start = datetime(2026, 1, 1, 12)
     run_scan(settings, WiringStore(), [], env={}, now=start, collect=lambda *a, **k: switch(0, 0))
@@ -49,7 +49,7 @@ def test_scan_puts_load_on_the_cable_and_keeps_a_week(temp_db, tmp_path):
 
 def test_page_shows_busy_cable_and_graph(temp_db, tmp_path):
 
-    settings = AtlasConfig(wiring={"enabled": True, "cabling_file": str(tmp_path / "cabling.yaml"),
+    settings = LanxangConfig(wiring={"enabled": True, "cabling_file": str(tmp_path / "cabling.yaml"),
                                    "switches": [{"name": "core-switch", "host": "192.0.2.2"}]})
     start = datetime(2026, 1, 1, 12)
     for step, total in enumerate((0, 45_000_000_000, 99_000_000_000)):

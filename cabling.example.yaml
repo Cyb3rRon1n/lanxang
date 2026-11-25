@@ -10,7 +10,7 @@ panels:
 # Runs without a panel: label a switch port directly.
 ports:
   "gateway:Port 3": {label: "ISP router (Wi-Fi only)", color: yellow}
-# Front panel, exactly as printed on the device (optional; otherwise atlas uses a common
+# Front panel, exactly as printed on the device (optional; otherwise Lanxang uses a common
 # convention). Rows top to bottom, ports left to right, "-" = a gap between port groups,
 # "sfp:<port>" = an SFP cage that shares (combo) that port. Example: Cisco SG300-28.
 faceplates:

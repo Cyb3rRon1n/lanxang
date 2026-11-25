@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from lanxang.config.models import AtlasConfig, DnsFilterConfig
+from lanxang.config.models import LanxangConfig, DnsFilterConfig
 from lanxang.monitoring import dnsfilter
 from lanxang.web.home_page import build_hosts, render_home_page
 
@@ -95,7 +95,7 @@ def test_blocking_off_twice_alerts_once_and_again_when_back(temp_db):
     from lanxang.posture.store import PostureStore
 
     store, sent = PostureStore(temp_db), []
-    settings = AtlasConfig(dns_filter=_config())
+    settings = LanxangConfig(dns_filter=_config())
     t = datetime(2026, 11, 17, 9)
     states = [True, False, False, False, True]
     for i, on in enumerate(states):

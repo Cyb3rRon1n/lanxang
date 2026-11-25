@@ -10,7 +10,7 @@ from lanxang.proxmox import (
     discover_resources,
 )
 from lanxang.reporting.trends import build_trends_payload
-from lanxang.events import AtlasEvent
+from lanxang.events import LanxangEvent
 from lanxang.knowledge.store import KnowledgeStore
 from lanxang.core.application import application
 
@@ -25,7 +25,7 @@ def network_map(
     """
     Build the network map (lanxang web /map): containers by network with
     their public hostnames, Proxmox guests, configured LAN hosts'
-    reachability, the AI endpoint - and what atlas may act on. Saved so
+    reachability, the AI endpoint - and what Lanxang may act on. Saved so
     the web view can render it; run it on a schedule to keep
     the map current.
     """
@@ -206,7 +206,7 @@ def lan_scan(
         _scan_extras(settings, store)
     if result["new"] or result["offline"] or result["notify_errors"]:
         application.runtime.events.publish(
-            AtlasEvent(event_type="atlas.devices.scan.completed", source="LanScan", payload=result)
+            LanxangEvent(event_type="atlas.devices.scan.completed", source="LanScan", payload=result)
         )
 
     if json_output:
@@ -434,7 +434,7 @@ def sample():
             "unhealthy": sum(c["health"] == "unhealthy" for c in containers),
         }
 
-    application.runtime.events.publish(AtlasEvent(event_type="atlas.host.sample", source="HostSample", payload=payload))
+    application.runtime.events.publish(LanxangEvent(event_type="atlas.host.sample", source="HostSample", payload=payload))
     console.print(json.dumps(payload))
 
     # host health alerts: temperatures near their limit, memory/disks nearly full, crashed containers
@@ -499,7 +499,7 @@ def wiring_scan(
     """
     One read-only pass over the configured switches (SNMPv3) and, if enabled,
     the UniFi console; saves a snapshot for /cabling. On demand, like every
-    atlas command - the web Refresh button runs the same thing.
+    Lanxang command - the web Refresh button runs the same thing.
     """
 
     from lanxang.devices.store import InventoryStore

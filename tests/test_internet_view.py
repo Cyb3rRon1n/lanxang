@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import requests
 
 from lanxang.alerts import AlertStore
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.posture.internet_view import lookup, reassess, run
 from lanxang.posture.model import build_posture
 from lanxang.posture.store import PostureStore
@@ -11,7 +11,7 @@ from lanxang.posture.store import PostureStore
 NOW = datetime(2026, 11, 19, 12, 0)
 IP = "203.0.113.7"
 URL = "https://internetdb.shodan.io/{ip}"
-ON = AtlasConfig(posture={"internet_view": True})
+ON = LanxangConfig(posture={"internet_view": True})
 
 
 class Reply:
@@ -153,7 +153,7 @@ def test_404_after_an_ip_change_is_a_clean_answer(temp_db):
 def test_reassess_resolves_a_newly_expected_port_without_a_lookup(temp_db):
     store, sent = home(temp_db), []
     run(ON, store, NOW, get=shodan([443, 22]), send=sent.append)
-    later = AtlasConfig(posture={"internet_view": True, "expected_ports": [22, 80, 443]})
+    later = LanxangConfig(posture={"internet_view": True, "expected_ports": [22, 80, 443]})
     texts, detail = reassess(later, store, NOW + timedelta(hours=1), send=sent.append)
     assert texts == ["**✓ Port 22 is now expected**"] and sent[-1] == texts[0]
     assert detail["ports"] == [{"port": 22, "expected": True}, {"port": 443, "expected": True}]
@@ -205,9 +205,9 @@ def test_force_looks_up_inside_24h(temp_db):
 
 def test_off_by_default_does_nothing(temp_db):
     store, get = home(temp_db), shodan([22])
-    assert AtlasConfig().posture.internet_view is False
-    assert AtlasConfig().posture.expected_ports == [80, 443]
-    assert run(AtlasConfig(), store, NOW, get=get, force=True) == ([], {})
+    assert LanxangConfig().posture.internet_view is False
+    assert LanxangConfig().posture.expected_ports == [80, 443]
+    assert run(LanxangConfig(), store, NOW, get=get, force=True) == ([], {})
     assert get.calls == [] and "internet_view" not in store.statuses()
 
 
@@ -267,7 +267,7 @@ def test_turning_it_off_resolves_alerts_and_clears_the_view(temp_db):
     run(ON, store, NOW, get=shodan([22]), send=lambda text: None)
     assert open_alerts(temp_db)
     get = shodan([22])
-    assert run(AtlasConfig(), store, NOW + timedelta(hours=1), get=get) == ([], {})
+    assert run(LanxangConfig(), store, NOW + timedelta(hours=1), get=get) == ([], {})
     assert get.calls == [] and open_alerts(temp_db) == []
     assert "internet_view" not in store.statuses() and build_posture(store, NOW)["internet"] is None
 
@@ -332,7 +332,7 @@ def test_posture_block_says_when_nothing_is_seen():
 
 def test_reassess_alerts_when_a_port_leaves_the_expected_list(temp_db):
     store, sent = home(temp_db), []
-    wide = AtlasConfig(posture={"internet_view": True, "expected_ports": [22, 443]})
+    wide = LanxangConfig(posture={"internet_view": True, "expected_ports": [22, 443]})
     run(wide, store, NOW, get=shodan([443, 22]), send=sent.append)
     assert open_alerts(temp_db) == []
     texts, detail = reassess(ON, store, NOW + timedelta(hours=1), send=sent.append)

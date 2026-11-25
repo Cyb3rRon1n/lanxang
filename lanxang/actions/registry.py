@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 @dataclass
 class ActionDefinition:
     """
-    Everything AtlasAnalyzer and the CLI need to know about an action
+    Everything LanxangAnalyzer and the CLI need to know about an action
     type without knowing anything about Docker or Proxmox specifically.
     """
 
@@ -148,7 +148,7 @@ PLAN_STEP_EVENT_TYPES = {
 
 def is_action_grounded(action: "SuggestedAction", environment: dict) -> bool:
     """
-    Shared by AtlasAnalyzer and AtlasAgent (single actions and, now,
+    Shared by LanxangAnalyzer and LanxangAgent (single actions and, now,
     every step of a plan) so the "is this a real action type with a
     target Lanxang actually observed" check lives in one place - it was
     duplicated verbatim between the two before a plan's steps needed

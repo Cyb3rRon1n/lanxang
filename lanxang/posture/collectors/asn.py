@@ -97,8 +97,8 @@ RESOLVE = None      # socket.getaddrinfo unless a test swaps it
 
 
 def remember_download(url, note, table=None, store=None, resolve=None, asn_path="inventory/ip2asn-v4.tsv.gz"):
-    """Mark the owner of one of atlas's own download servers (this table, the IP-location file, the MAC maker
-    list) as known for the host, so atlas's own updates never show up as a new destination to review.
+    """Mark the owner of one of Lanxang's own download servers (this table, the IP-location file, the MAC maker
+    list) as known for the host, so Lanxang's own updates never show up as a new destination to review.
     Best effort: returns the keys marked, [] when anything fails."""
 
     import socket

@@ -236,7 +236,7 @@ def _name_and_kind(device, hint):
 
 
 def _clues(device, hint):
-    """One muted line: what atlas knows that helps say what this device is."""
+    """One muted line: what Lanxang knows that helps say what this device is."""
 
     parts = []
     found = (hint or {}).get("clues") or {}

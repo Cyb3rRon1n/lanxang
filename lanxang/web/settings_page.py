@@ -157,7 +157,7 @@ SNMP_GEAR = {"Ubiquiti": "unifi", "Synology": "nas", "QNAP": "nas", "MikroTik": 
 
 
 def _detected(config):
-    """Gear atlas has already seen or been given: configured cards, and makers answering SNMPv3 discovery."""
+    """Gear Lanxang has already seen or been given: configured cards, and makers answering SNMPv3 discovery."""
 
     found = {"switch"} if config.wiring.switches else set()
     found |= {"unifi"} if config.wiring.unifi.enabled else set()

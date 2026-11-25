@@ -284,7 +284,7 @@ function sync(){
   document.querySelectorAll(".theme-cycle").forEach(function(b){b.setAttribute("aria-label","Theme: "+NAME[t]+". Switch to "+NAME[NEXT[t]]);b.title="Theme: "+NAME[t];});
   var c=get("sidebar")==="on",say=c?"Expand sidebar":"Collapse sidebar";
   document.querySelectorAll(".side-toggle").forEach(function(b){b.setAttribute("aria-pressed",String(c));b.title=say;b.querySelector(".lbl").textContent=say;});}
-window.atlasTheme=function(){set("theme",NEXT[get("theme")]);};
+window.lanxangTheme=function(){set("theme",NEXT[get("theme")]);};
 function show(b){opener=b;panel.hidden=back.hidden=false;var app=document.querySelector(".app");if(app)app.inert=true;sync();panel.focus();}
 function hide(){panel.hidden=back.hidden=true;var app=document.querySelector(".app");if(app)app.inert=false;if(opener)opener.focus();}
 document.addEventListener("click",function(e){var b=e.target.closest("[data-pref] button");
@@ -318,7 +318,7 @@ function save(change){var body=cur();for(var k in change)body[k]=change[k];say.t
     body:JSON.stringify(body)}).then(function(r){return r.json().then(function(j){return[r.ok,j];});}).then(function(a){
     if(!a[0]){say.textContent=a[1].error||"Couldn't save.";return;}
     var s=a[1].display;R.dataset.clock=s.clock;R.dataset.datefmt=s.date_format;R.dataset.tz=s.time_zone;other=false;
-    if(window.atlasTimes)window.atlasTimes();sync();say.textContent="Saved.";
+    if(window.lanxangTimes)window.lanxangTimes();sync();say.textContent="Saved.";
     if(document.getElementById("ev-log"))location.reload();},function(){say.textContent="Couldn't reach Lanxang.";});}
 document.addEventListener("click",function(e){var b=e.target.closest("[data-spref] button");if(!b)return;
   var k=b.parentNode.dataset.spref,v=b.dataset.v;
@@ -425,7 +425,7 @@ function run(){var now=new Date(),z=R.dataset.tz||"browser";
   document.querySelectorAll("time[data-when]").forEach(function(t){
   var d=new Date(t.getAttribute("datetime"));if(isNaN(d))return;var p=parts(d);
   t.textContent=say(d,now,t.dataset.when);t.title=ymd(p)+" "+hm(p)+(fmt?" "+tz:"");});}
-window.atlasTimes=run;
+window.lanxangTimes=run;
 run();
 setInterval(run,60000);})();</script>"""
 
@@ -450,7 +450,7 @@ def section_tabs(page):
 
     return [(href, label, key == page) for href, label, key in SECTIONS.get(SECTION_OF.get(page), [])]
 
-SIGN_OUT = False    # set by run_server when atlas does its own sign-in (web.auth: builtin)
+SIGN_OUT = False    # set by run_server when Lanxang does its own sign-in (web.auth: builtin)
 AI_ON = True        # set per request by the server: no chat panel or "ask" chips while intelligence.provider is none
 DISPLAY = None      # set per request by the server: the display: settings (clock, time zone, date format); None = defaults
 
@@ -555,7 +555,7 @@ NAV_ICONS = {"home": "home", "alerts": "alert", "network": "network", "servers":
 
 # Rendered twice (page header; phone top bar), so classes, not ids. The theme icon follows data-theme from CSS.
 HEADER_BAR = (
-    '<div class="hbar"><button type="button" class="icon-btn theme-cycle" onclick="atlasTheme()" '
+    '<div class="hbar"><button type="button" class="icon-btn theme-cycle" onclick="lanxangTheme()" '
     'aria-label="Theme: Light. Switch to Dark" title="Theme: Light">'
     f'<span class="t-light">{icon("sun")}</span><span class="t-dark">{icon("moon")}</span>'
     f'<span class="t-system">{icon("monitor")}</span></button>'
@@ -624,7 +624,7 @@ def render_page(title, body_html, active="", tabs=None, drawer=True, heading=Non
 
 def ask_chips(questions):
     """
-    One-click questions that fill the docked chat (window.atlasAsk), or open /chat when there is no panel.
+    One-click questions that fill the docked chat (window.lanxangAsk), or open /chat when there is no panel.
     """
 
     if not AI_ON:
@@ -632,9 +632,9 @@ def ask_chips(questions):
     return '<div class="chips" aria-label="Ask Lanxang">' + "".join(
         f'<button data-ask="{_esc(q)}">{_esc(q)}</button>' for q in questions) + "</div>" + (
         # Delegated, so [data-ask] buttons rendered AFTER the chips (e.g. Access page "Investigate") work too.
-        "<script>if (!window.atlasAskBound) { window.atlasAskBound = true;"
+        "<script>if (!window.lanxangAskBound) { window.lanxangAskBound = true;"
         " document.addEventListener('click', (e) => { const b = e.target.closest('[data-ask]'); if (!b) return;"
-        " const q = b.dataset.ask; if (window.atlasAsk) window.atlasAsk(q); else location.href = '/chat?q=' +"
+        " const q = b.dataset.ask; if (window.lanxangAsk) window.lanxangAsk(q); else location.href = '/chat?q=' +"
         " encodeURIComponent(q); }); }</script>")
 
 
@@ -699,7 +699,7 @@ def render_overview_page(environment, analysis, summary=""):
 
         data = environment.get(key) or {}
 
-        # collect_storage() (atlas/discovery/storage.py) always returns a
+        # collect_storage() (lanxang/discovery/storage.py) always returns a
         # list - one row per mounted filesystem - never a dict, unlike every
         # other category here. _kv_table() unconditionally called .items()
         # on whatever it was given, so this crashed the whole page with an
@@ -714,7 +714,7 @@ def render_overview_page(environment, analysis, summary=""):
         )
 
     # lanxang discover's containers/virtualization categories are each
-    # keyed by plugin name (see lanxang.plugins.AtlasPlugin.category and
+    # keyed by plugin name (see lanxang.plugins.LanxangPlugin.category and
     # the per-category merge in lanxang.cli.main.discover()) - every
     # entry is {"available": bool, "containers"/"guests": [...]}, not
     # the resource itself. Flatten each plugin's list into rows,

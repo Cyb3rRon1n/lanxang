@@ -9,10 +9,10 @@ from lanxang.reporting.generator import generate_report
 from lanxang.config import load_config, write_config, write_setup_log
 from lanxang.config import local
 from lanxang.config.local import config_file
-from lanxang.config.models import AtlasConfig, IntelligenceConfig, MonitoringConfig, ProxmoxConfig
+from lanxang.config.models import LanxangConfig, IntelligenceConfig, MonitoringConfig, ProxmoxConfig
 from lanxang.health import run_checks
 from lanxang.plugins import PluginManager
-from lanxang.events import AtlasEvent
+from lanxang.events import LanxangEvent
 from lanxang.knowledge.queries import KnowledgeQueries
 from lanxang.knowledge.store import KnowledgeStore
 from lanxang.core.application import application
@@ -126,7 +126,7 @@ def init():
 
     name = typer.prompt(
         "Instance name (just a label for this Lanxang install)",
-        default="atlas-node"
+        default="lanxang-node"
     )
 
     log_lines.append(f"name: {name}")
@@ -148,7 +148,7 @@ def init():
 
         user = typer.prompt(
             "Proxmox user (the user the token/password below belongs to)",
-            default="atlas@pve"
+            default="lanxang@pve"
         )
 
         if typer.confirm("Use an API token instead of a password?", default=True):
@@ -284,7 +284,7 @@ def init():
 
         log_lines.append("monitoring: disabled")
 
-    config = AtlasConfig(
+    config = LanxangConfig(
         name=name,
         proxmox=proxmox,
         intelligence=intelligence,
@@ -424,7 +424,7 @@ def discover():
     )
 
     runtime.events.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.discovery.completed",
             source="DiscoveryEngine",
             payload=data
@@ -432,7 +432,7 @@ def discover():
     )
 
     runtime.events.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.plugins.discovery.completed",
             source="PluginManager",
             payload=plugin_data

@@ -1,7 +1,7 @@
 import pytest
 
 from lanxang.events import EventBus
-from lanxang.plugins.base import AtlasPlugin
+from lanxang.plugins.base import LanxangPlugin
 from lanxang.plugins.loader import discover_plugins
 from lanxang.plugins.manager import PluginManager
 
@@ -9,7 +9,7 @@ from lanxang.plugins.manager import PluginManager
 def test_atlas_plugin_cannot_be_instantiated_directly():
 
     with pytest.raises(TypeError):
-        AtlasPlugin()
+        LanxangPlugin()
 
 
 class FakeRuntime:
@@ -18,7 +18,7 @@ class FakeRuntime:
         self.events = EventBus()
 
 
-class FakePlugin(AtlasPlugin):
+class FakePlugin(LanxangPlugin):
 
     name = "Fake"
     version = "0.0.1"
@@ -78,7 +78,7 @@ def test_discover_plugins_finds_libvirt_plugin():
 def test_plugin_category_defaults_to_unknown():
     """
     A plugin that forgets to set category shouldn't silently land in
-    someone else's category - AtlasEnvironmentContext.update() only
+    someone else's category - LanxangEnvironmentContext.update() only
     recognizes real category names, so "unknown" is a safe no-op.
     """
 

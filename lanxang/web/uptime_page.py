@@ -1,6 +1,6 @@
 """
 /uptime (Servers > Uptime): one row per uptime check - up/down, response time, uptime over 24 h / 7 days /
-30 days, a 24 h graph - plus a form to add a check and one-click suggestions from the public hostnames atlas
+30 days, a 24 h graph - plus a form to add a check and one-click suggestions from the public hostnames Lanxang
 already knows. Checks added here are saved to the web settings; a list in the config file wins and locks the form.
 """
 
@@ -324,7 +324,7 @@ def render_uptime_page(checks, summary, now, fail_after=2, suggestions=(), locke
 
 
 def suggestions(checks):
-    """(name, https://host) for public hostnames atlas knows (Traefik routes, cert_hosts) not checked yet."""
+    """(name, https://host) for public hostnames Lanxang knows (Traefik routes, cert_hosts) not checked yet."""
 
     try:
         from lanxang.config.loader import load_config

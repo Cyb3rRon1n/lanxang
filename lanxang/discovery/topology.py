@@ -72,7 +72,7 @@ def _docker_topology(client):
 
 def collect_topology(config, docker_client=None, proxmox_resources=None):
     """
-    Everything atlas can see - and what it's allowed to act on - in one
+    Everything Lanxang can see - and what it's allowed to act on - in one
     snapshot for the network map: this host's containers by network,
     Proxmox guests, the configured LAN hosts (TCP reachability), and the AI
     endpoint. Callers pass the live clients; nothing here writes anywhere.
@@ -120,7 +120,7 @@ def collect_topology(config, docker_client=None, proxmox_resources=None):
         },
         "lan": lan,
         "brain": brain,
-        # What atlas may act on (always as a proposed plan, each step confirmed) vs only watch.
+        # What Lanxang may act on (always as a proposed plan, each step confirmed) vs only watch.
         "responsibility": {
             "containers": "restart / stop / resize",
             "proxmox_guests": "restart / shutdown / resize" if config.proxmox.enabled else "",

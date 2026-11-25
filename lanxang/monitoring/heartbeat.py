@@ -1,9 +1,9 @@
 """
-Heartbeats: for the jobs atlas can't check from outside - a nightly backup, a cron job, a script on another box.
+Heartbeats: for the jobs Lanxang can't check from outside - a nightly backup, a cron job, a script on another box.
 The job calls its secret ping address when it finishes:
 
-    curl -fsS -m 10 http://atlas.example:8420/ping/<token>          # it worked
-    curl -fsS -m 10 http://atlas.example:8420/ping/<token>/fail     # it ran and failed
+    curl -fsS -m 10 http://lanxang.example:8420/ping/<token>          # it worked
+    curl -fsS -m 10 http://lanxang.example:8420/ping/<token>/fail     # it ran and failed
 
 Checked once a minute with the uptime checks: a heartbeat that hasn't pinged within every_minutes + grace_minutes
 is late - one alert then, one when it pings again. A /fail ping alerts right away. Nothing is said before the first

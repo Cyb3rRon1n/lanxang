@@ -1,24 +1,24 @@
-from lanxang.core.context import AtlasContext
+from lanxang.core.context import LanxangContext
 from lanxang.config import load_config
 from lanxang.events import EventBus
-from lanxang.intelligence.context import AtlasEnvironmentContext
+from lanxang.intelligence.context import LanxangEnvironmentContext
 from lanxang.listeners import DatabaseListener
 
 
-class AtlasRuntime:
+class LanxangRuntime:
     """
     Central runtime object.
     """
 
     def __init__(self):
 
-        self.context = AtlasContext()
+        self.context = LanxangContext()
 
         self.context.config = (
             load_config().model_dump()
         )
 
-        self.environment = AtlasEnvironmentContext()
+        self.environment = LanxangEnvironmentContext()
 
         self.events = EventBus()
 
