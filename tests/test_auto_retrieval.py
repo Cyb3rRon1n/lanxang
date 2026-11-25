@@ -1,5 +1,5 @@
-from lanxang.config.models import AtlasConfig
-from lanxang.intelligence.agent import AtlasAgent
+from lanxang.config.models import LanxangConfig
+from lanxang.intelligence.agent import LanxangAgent
 from lanxang.intelligence.providers import ChatReply
 from lanxang.knowledge.notes import search_notes
 
@@ -21,11 +21,11 @@ def _setup(tmp_path, **knowledge):
         "# Torrents stuck at downloading metadata\n\nCause: VPN server without P2P; check qBit firewalled.\n")
     (tmp_path / "vulcan-docs.md").write_text("# Torrents\n\nvulcan runs qbittorrent behind gluetun. torrents torrents.\n")
     (tmp_path / "HOSTS.md").write_text("media-server = 192.168.50.157\n")
-    config = AtlasConfig()
+    config = LanxangConfig()
     for key, value in knowledge.items():
         setattr(config.knowledge, key, value)
     provider = _Capture()
-    return AtlasAgent(provider, config), provider
+    return LanxangAgent(provider, config), provider
 
 
 def test_notes_and_pinned_attached_to_latest_question_on_a_copy(tmp_path):

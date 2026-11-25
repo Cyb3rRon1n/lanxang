@@ -1,7 +1,7 @@
 """
 "What changed" at the top of Activity: the last 24 hours (or 7 days) in plain words, newest first: problems that
 started or cleared, one-off findings (a new open port, a certificate), new devices, Proxmox guests added, removed
-or stopped, and container limits crossed. Built from what atlas already saved; nothing is measured here.
+or stopped, and container limits crossed. Built from what Lanxang already saved; nothing is measured here.
 """
 
 import json

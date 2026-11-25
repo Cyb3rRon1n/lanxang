@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from lanxang.config.models import AtlasConfig, HealthConfig
+from lanxang.config.models import LanxangConfig, HealthConfig
 from lanxang.health.alerts import alerts, assess, container_problem, container_state, run
 from lanxang.posture.store import PostureStore
 from lanxang.web.home_page import build_hosts
@@ -59,7 +59,7 @@ def test_memory_disks_containers_and_feeds():
 
 
 def test_alerts_once_and_on_recovery(temp_db):
-    store, sent, settings = PostureStore(temp_db), [], AtlasConfig()
+    store, sent, settings = PostureStore(temp_db), [], LanxangConfig()
     run(settings, store, health(memory_percent=95.0), [], NOW, send=sent.append)
     run(settings, store, health(memory_percent=96.0), [], NOW, send=sent.append)
     assert len(sent) == 1 and "Memory almost full" in sent[0]
@@ -69,7 +69,7 @@ def test_alerts_once_and_on_recovery(temp_db):
 
 
 def test_alerts_can_be_turned_off(temp_db):
-    sent, settings = [], AtlasConfig(health={"alerts": False})
+    sent, settings = [], LanxangConfig(health={"alerts": False})
     issues = run(settings, PostureStore(temp_db), health(memory_percent=99.0), [], NOW, send=sent.append)
     assert sent == [] and issues                      # still recorded for the home page
 

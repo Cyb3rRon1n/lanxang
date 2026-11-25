@@ -2,12 +2,12 @@ import importlib
 import inspect
 import pkgutil
 
-from lanxang.plugins.base import AtlasPlugin
+from lanxang.plugins.base import LanxangPlugin
 
 
 def discover_plugins(package_name="lanxang.plugins"):
     """
-    Discover AtlasPlugin subclasses in the plugins package.
+    Discover LanxangPlugin subclasses in the plugins package.
     """
 
     plugins = []
@@ -33,8 +33,8 @@ def discover_plugins(package_name="lanxang.plugins"):
 
         for _, obj in inspect.getmembers(module, inspect.isclass):
             if (
-                issubclass(obj, AtlasPlugin)
-                and obj is not AtlasPlugin
+                issubclass(obj, LanxangPlugin)
+                and obj is not LanxangPlugin
             ):
                 plugins.append(obj())
 

@@ -10,7 +10,7 @@ from lanxang.services import detect_services
 from lanxang.compose import parse_compose_file
 from lanxang.monitoring import collect_container_metrics, collect_metrics, evaluate_thresholds
 from lanxang.monitoring.changes import diff_monitoring, format_change as format_monitoring_change
-from lanxang.events import AtlasEvent
+from lanxang.events import LanxangEvent
 from lanxang.knowledge.queries import KnowledgeQueries
 from lanxang.knowledge.store import KnowledgeStore
 from lanxang.core.application import application
@@ -238,7 +238,7 @@ def monitor(
     )
 
     runtime.events.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.monitoring.scan.completed",
             source="MonitoringScan",
             payload=data
@@ -248,7 +248,7 @@ def monitor(
     if any(exceeded.values()):
 
         runtime.events.publish(
-            AtlasEvent(
+            LanxangEvent(
                 event_type="atlas.monitoring.threshold_exceeded",
                 source="MonitoringScan",
                 payload={
@@ -264,7 +264,7 @@ def monitor(
     if changes:
 
         runtime.events.publish(
-            AtlasEvent(
+            LanxangEvent(
                 event_type="atlas.monitoring.changes_detected",
                 source="MonitoringScan",
                 payload={"changes": changes}
@@ -423,7 +423,7 @@ def restart(
     runtime = application.runtime
 
     runtime.events.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.action.container_restarted",
             source="RestartAction",
             payload={
@@ -508,7 +508,7 @@ def stop(
     runtime = application.runtime
 
     runtime.events.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.action.container_stopped",
             source="StopAction",
             payload={
@@ -627,7 +627,7 @@ def resize(
     runtime = application.runtime
 
     runtime.events.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.action.container_resized",
             source="ResizeAction",
             payload={

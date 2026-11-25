@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 
 @dataclass
-class AtlasContext:
+class LanxangContext:
     """
     Shared runtime context for Lanxang.
     Every subsystem contributes information here.

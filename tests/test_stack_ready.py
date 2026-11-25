@@ -46,7 +46,7 @@ def test_empty_config_file_is_defaults(isolated_cwd):
 
     (isolated_cwd / "lanxang.yaml").write_text("")
 
-    assert loader.load_config().name == "atlas-node"
+    assert loader.load_config().name == "lanxang-node"
 
 
 def _topology(down=False, unhealthy=False):
@@ -92,7 +92,7 @@ def test_api_summary_route_serves_json(monkeypatch):
     from lanxang.web import server
 
     monkeypatch.setattr(server.KnowledgeQueries, "latest_topology", lambda self: _topology())
-    httpd = ThreadingHTTPServer(("127.0.0.1", 0), server.AtlasWebHandler)
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), server.LanxangWebHandler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
 
     try:

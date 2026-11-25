@@ -1,5 +1,5 @@
 """
-Clues for naming a new device, from what atlas already has - no extra scanning:
+Clues for naming a new device, from what Lanxang already has - no extra scanning:
 
   maker       the IEEE's public list of MAC prefixes (oui.csv, refreshed monthly into inventory/)
   private     a randomised MAC (the locally administered bit): phones, tablets and laptops do this on Wi-Fi
@@ -105,7 +105,7 @@ def refresh(now, path=OUI_PATH, url=OUI_URL, get=None):
         return False
     try:
         import requests
-        response = (get or GET or requests.get)(url, timeout=60, headers={"User-Agent": "atlas"})
+        response = (get or GET or requests.get)(url, timeout=60, headers={"User-Agent": "lanxang"})
         response.raise_for_status()
         if len(parse_oui(response.text)) < 1000:
             return False
@@ -208,7 +208,7 @@ def places(snapshot, devices):
 
 
 def clues(device, table, open_ports=(), place=None):
-    """What atlas knows that helps name one device: {"maker", "private", "hostname", "place", "ports"}."""
+    """What Lanxang knows that helps name one device: {"maker", "private", "hostname", "place", "ports"}."""
 
     from lanxang.devices.ports import COMMON_PORTS
 
@@ -297,7 +297,7 @@ def for_devices(devices, table, open_ports=None, snapshot=None):
 
 
 def gather(devices):
-    """for_devices() with the data atlas has saved; any source that fails is just left out."""
+    """for_devices() with the data Lanxang has saved; any source that fails is just left out."""
 
     open_ports = snapshot = None
     try:

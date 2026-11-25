@@ -22,8 +22,8 @@ inventory:
 proxmox:
   enabled: true
   host: 192.168.1.10
-  user: atlas@pve
-  token_name: atlas-token
+  user: lanxang@pve
+  token_name: lanxang-token
   token_value: ""
   # password: ""
   verify_ssl: false
@@ -48,7 +48,7 @@ fleet:
 
 ## `name`
 
-A label for this Lanxang instance. Defaults to `atlas-node`.
+A label for this Lanxang instance. Defaults to `lanxang-node`.
 
 ## `discovery`
 
@@ -74,7 +74,7 @@ See [Deployment](deployment/index.md) for why a scoped API token is preferred ov
 |---|---|---|
 | `enabled` | `false` | Must be `true` for `lanxang proxmox scan` to attempt a connection |
 | `host` | `""` | Proxmox host/IP |
-| `user` | `""` | Proxmox user, e.g. `atlas@pve` |
+| `user` | `""` | Proxmox user, e.g. `lanxang@pve` |
 | `token_name` | `""` | API token name — **preferred** over `password` |
 | `token_value` | `""` | API token value |
 | `password` | `""` | Fallback if not using a token |
@@ -299,7 +299,7 @@ scrape_configs:
   - job_name: lanxang
     scrape_interval: 60s
     authorization: {credentials: <lanxang auth token>}
-    static_configs: [{targets: ["atlas.example:8420"]}]
+    static_configs: [{targets: ["lanxang.example:8420"]}]
 ```
 
 ## Alerts page
@@ -388,8 +388,8 @@ A check that fails `fail_after` times in a row is **down**: one alert ("Media se
 For jobs lanxang can't check from outside, such as a nightly backup or a cron job: add one on Servers → Uptime (or under `uptime.heartbeats`), then have the job call its address when it finishes. Add `/fail` when it failed.
 
 ```bash
-your-backup-command && curl -fsS -m 10 http://atlas.example:8420/ping/<token> \
-                    || curl -fsS -m 10 http://atlas.example:8420/ping/<token>/fail
+your-backup-command && curl -fsS -m 10 http://lanxang.example:8420/ping/<token> \
+                    || curl -fsS -m 10 http://lanxang.example:8420/ping/<token>/fail
 ```
 
 ```yaml
@@ -605,7 +605,7 @@ notify:
   email:
     host: smtp.example.com
     port: 587
-    user: atlas@example.com
+    user: lanxang@example.com
     to: [me@example.com]
   apprise:                           # 100+ more services, see the Apprise wiki
     - tgram://bottoken/ChatID

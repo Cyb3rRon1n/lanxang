@@ -4,7 +4,7 @@ import urllib.request
 from datetime import datetime, timedelta
 from http.server import ThreadingHTTPServer
 
-from lanxang.config.models import AtlasConfig, Heartbeat
+from lanxang.config.models import LanxangConfig, Heartbeat
 from lanxang.monitoring import heartbeat
 from lanxang.web.uptime_page import handle_post, render_uptime_page
 
@@ -24,7 +24,7 @@ def test_late_failed_and_back_alert_once_each(temp_db):
     from lanxang.posture.store import PostureStore
 
     store, sent = PostureStore(temp_db), []
-    settings = AtlasConfig(uptime={"heartbeats": [{"name": "Backup", "every_minutes": 60, "grace_minutes": 15}]})
+    settings = LanxangConfig(uptime={"heartbeats": [{"name": "Backup", "every_minutes": 60, "grace_minutes": 15}]})
     t = datetime(2026, 11, 17, 0, 0)
 
     def check(minutes):
@@ -46,10 +46,10 @@ def test_late_failed_and_back_alert_once_each(temp_db):
 def test_ping_address_needs_no_sign_in_and_rejects_bad_tokens(temp_db, isolated_cwd):
     from lanxang.posture.store import PostureStore
     from lanxang.web.auth import Auth
-    from lanxang.web.server import AtlasWebHandler
+    from lanxang.web.server import LanxangWebHandler
 
     (isolated_cwd / "lanxang.yaml").write_text("uptime:\n  heartbeats:\n    - name: Backup\n")
-    handler = type("Handler", (AtlasWebHandler,), {"auth": Auth(isolated_cwd / "auth.json")})
+    handler = type("Handler", (LanxangWebHandler,), {"auth": Auth(isolated_cwd / "auth.json")})
     httpd = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     base = f"http://127.0.0.1:{httpd.server_port}"

@@ -79,7 +79,7 @@ def _top_users(now):
 def same_origin(headers):
     """
     Cross-site request forgery guard for the write routes: Authelia's cookie rides along
-    on any request the browser makes, so a POST must provably come from atlas's own pages.
+    on any request the browser makes, so a POST must provably come from Lanxang's own pages.
     """
 
     if headers.get("Sec-Fetch-Site") == "same-origin":
@@ -116,7 +116,7 @@ def _notify_settings():
 TRUSTED_PROXIES = ("127.0.0.0/8", "::1/128", "172.16.0.0/12")
 
 
-class AtlasWebHandler(BaseHTTPRequestHandler):
+class LanxangWebHandler(BaseHTTPRequestHandler):
 
     auth = None     # an lanxang.web.auth.Auth when web.auth is builtin; None = an auth proxy guards the host
     trusted_proxies = TRUSTED_PROXIES   # peers whose X-Forwarded-For is believed (web.trusted_proxies)
@@ -769,7 +769,7 @@ def run_server(host="127.0.0.1", port=8420, auth=None, trusted_proxies=None):
     from lanxang.web import render
 
     render.SIGN_OUT = auth is not None
-    handler = type("AtlasWebHandler", (AtlasWebHandler,),
+    handler = type("LanxangWebHandler", (LanxangWebHandler,),
                    {"auth": auth, "trusted_proxies": tuple(trusted_proxies or TRUSTED_PROXIES)})
     httpd = ThreadingHTTPServer((host, port), handler)
 

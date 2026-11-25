@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 
 REPO = Path(__file__).resolve().parent.parent
 
@@ -56,7 +56,7 @@ def test_fresh_install_upgrade_and_uninstall(sandbox):
     assert "LANXANG_CONFIG" not in env
     assert "LANXANG_TAG=latest" in env
     assert oct((target / ".env").stat().st_mode & 0o777) == "0o600"
-    config = AtlasConfig(**yaml.safe_load((target / "lanxang.yaml").read_text()))
+    config = LanxangConfig(**yaml.safe_load((target / "lanxang.yaml").read_text()))
     assert config.intelligence.provider == "ollama" and config.intelligence.ollama_host == "http://10.1.2.3:11434"
     assert config.web.auth == "builtin"
     assert oct((target / "lanxang.yaml").stat().st_mode & 0o777) == "0o644"   # read by the container user

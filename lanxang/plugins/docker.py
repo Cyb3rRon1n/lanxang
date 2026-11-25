@@ -1,8 +1,8 @@
-from lanxang.plugins import AtlasPlugin
+from lanxang.plugins import LanxangPlugin
 from lanxang.docker import collect_containers
 
 
-class DockerPlugin(AtlasPlugin):
+class DockerPlugin(LanxangPlugin):
     """
     Lanxang Docker Plugin
     """

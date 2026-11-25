@@ -32,7 +32,7 @@ global.fetch = async (url, options) => {
 };
 
 (async () => {
-  await globalThis.atlasAskAll(["one", "two", "three"]);
+  await globalThis.lanxangAskAll(["one", "two", "three"]);
   check(chatMessages.length === 3, "expected 3 chat calls, got " + chatMessages.length);
   check(chatMessages.join(",") === "one,two,three", "expected batches in order, got " + chatMessages.join(","));
   check(maxInFlight === 1, "batches must be sequential - max in flight was " + maxInFlight);

@@ -62,7 +62,7 @@ def test_render_overview_page_flattens_containers_dict():
     """
     containers is keyed by plugin name, not container name - each
     entry is {"available": bool, "containers": [...]} (see
-    lanxang.plugins.AtlasPlugin.category). A real container's own name
+    lanxang.plugins.LanxangPlugin.category). A real container's own name
     lives inside that nested list, not as the dict key.
     """
 
@@ -207,7 +207,7 @@ def test_every_page_gets_the_chat_drawer_except_chat():
 
     html = render_page("Devices", "", active="devices")
 
-    assert 'id="chat-drawer"' in html and 'id="ask"' in html and "atlasAsk" in html
+    assert 'id="chat-drawer"' in html and 'id="ask"' in html and "lanxangAsk" in html
     assert 'id="chat-drawer"' not in render_page("Chat", "", drawer=False)
 
 
@@ -243,10 +243,10 @@ def test_server_turns_the_chat_off_with_the_setting(temp_db, isolated_cwd):
     import urllib.request
     from http.server import ThreadingHTTPServer
 
-    from lanxang.web.server import AtlasWebHandler
+    from lanxang.web.server import LanxangWebHandler
 
     (isolated_cwd / "lanxang.yaml").write_text("web:\n  auth: proxy\n")
-    httpd = ThreadingHTTPServer(("127.0.0.1", 0), AtlasWebHandler)
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), LanxangWebHandler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
         page = lambda: urllib.request.urlopen(f"http://127.0.0.1:{httpd.server_port}/alerts").read().decode()

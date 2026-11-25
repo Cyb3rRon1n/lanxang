@@ -1,7 +1,7 @@
 """
 Cytoscape elements for the interactive map (lanxang web /map): one node per
 inventory device, Proxmox guests nested inside their host, this host's
-Docker networks nested inside the atlas host, all hanging off Internet ->
+Docker networks nested inside the Lanxang host, all hanging off Internet ->
 (router or LAN).
 
 The root is the device whose `lan` sighting carries `detail["gateway"] is
@@ -17,7 +17,7 @@ no top-level node for the layout to root the tree at.
 
 A device whose effective `connection` is "wireless" is left out entirely
 (no node, no edge) unless `include_wireless` - counted in `hidden_wireless`
-- except the router itself, a Proxmox/atlas host with children, and any
+- except the router itself, a Proxmox/Lanxang host with children, and any
 device referenced by another shown device's `uplink_id` (an AP kept
 visible purely because something's hanging off it). A top-level device
 (no `parent`) whose `uplink_id` points at another shown, top-level device

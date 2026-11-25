@@ -16,7 +16,7 @@ def test_header_bar_on_every_page_and_sidebar_theme_button_gone():
     assert html.count('class="hbar"') == 2           # page header + phone top bar
     # the desktop header bar comes right after the skip link, before the sidebar and the page, for keyboard order
     assert html.index('class="skip"') < html.index('class="hbar"') < html.index('<aside') < html.index('<main')
-    assert html.count('class="icon-btn theme-cycle" onclick="atlasTheme()"') == 2
+    assert html.count('class="icon-btn theme-cycle" onclick="lanxangTheme()"') == 2
     assert 'aria-label="Theme: Light. Switch to Dark"' in html
     assert html.count('class="icon-btn prefs-open" aria-haspopup="dialog" aria-controls="prefs"') == 2
     assert "Dark mode" not in html and "Light mode" not in html and "theme-btn" not in html

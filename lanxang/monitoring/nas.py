@@ -150,13 +150,13 @@ def _synology(http, base, user, password, timeout, verify):
     if not user or not password:
         raise NasError(f"Add the Synology account and its password (the {PASSWORD_ENV} secret)")
     sid = call("sign-in", api="SYNO.API.Auth", version="6", method="login", account=user, passwd=password,
-               session="atlas", format="sid").get("sid")
+               session="lanxang", format="sid").get("sid")
     try:
         info = call("storage", api="SYNO.Storage.CGI.Storage", version="1", method="load_info", _sid=sid)
     finally:
         try:
             http.post(f"{base}/webapi/entry.cgi", data={"api": "SYNO.API.Auth", "version": "6", "method": "logout",
-                                                         "session": "atlas", "_sid": sid},
+                                                         "session": "lanxang", "_sid": sid},
                       timeout=timeout, verify=verify)
         except Exception:
             pass

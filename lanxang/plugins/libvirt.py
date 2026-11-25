@@ -1,8 +1,8 @@
-from lanxang.plugins import AtlasPlugin
+from lanxang.plugins import LanxangPlugin
 from lanxang.libvirt import collect_guests
 
 
-class LibvirtPlugin(AtlasPlugin):
+class LibvirtPlugin(LanxangPlugin):
     """
     Lanxang libvirt/KVM Plugin
     """

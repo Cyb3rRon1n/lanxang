@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, inspect, text
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.database.engine import enable_wal
 from lanxang.database.models import Base
 from lanxang.devices import Sighting
@@ -26,7 +26,7 @@ def test_enable_wal_sets_journal_mode_and_busy_timeout(tmp_path):
 
 def test_scan_and_notify_config_defaults():
 
-    config = AtlasConfig()
+    config = LanxangConfig()
 
     assert config.scan.enabled is True
     assert config.scan.subnets == []

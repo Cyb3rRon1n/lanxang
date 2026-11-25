@@ -21,7 +21,7 @@ class FakeAgent:
 
 class CopyingFakeAgent:
     """
-    Mimics AtlasAgent._with_notes(): when notes are configured, converse()
+    Mimics LanxangAgent._with_notes(): when notes are configured, converse()
     is handed a *copy* of messages and appends the assistant reply to that
     copy only - the original list passed in is never mutated. chat_turn
     must not rely on that mutation to preserve history.
@@ -75,7 +75,7 @@ def test_turn_keeps_history_per_session_and_logs_event(temp_db):
 
 def test_turn_history_survives_agent_copying_messages_before_appending(temp_db):
     """
-    IMPORTANT regression test: AtlasAgent.converse() can hand the provider a
+    IMPORTANT regression test: LanxangAgent.converse() can hand the provider a
     *copy* of messages (_with_notes() does this whenever notes are
     configured) and only append the assistant reply to that copy - chat_turn
     must still store the assistant's own reply itself, not rely on the
@@ -153,7 +153,7 @@ def test_execute_step_grounds_runs_and_logs(temp_db):
     assert status == 200 and payload == {"ok": True, "result": {"success": True, "previous_status": "running"}}
     assert calls[0].target == "sonarr"
     event = KnowledgeQueries().recent_events(5)[0]
-    assert event.event_type == "atlas.action.container_restarted" and event.source == "AtlasWeb"
+    assert event.event_type == "atlas.action.container_restarted" and event.source == "LanxangWeb"
 
 
 def test_execute_step_refuses_ungrounded_and_malformed(temp_db):

@@ -141,6 +141,6 @@ def test_investigate_button_is_bound_after_chips():
     place = {"user": "erin", "app": "jellyfin", "label": "Springfield, Illinois, US", "status": "review",
              "first_seen": "2026-11-10 19:19", "last_seen": "2026-11-10 19:37", "ip": "8.8.4.4", "place_key": "k"}
     html = render_access_page({"visitors": [], "logins": []}, "7d", user_places=[place])
-    assert html.index("atlasAskBound") < html.index(">Investigate</button>")    # script precedes the button...
+    assert html.index("lanxangAskBound") < html.index(">Investigate</button>")    # script precedes the button...
     assert "document.addEventListener('click'" in html and "closest('[data-ask]')" in html   # ...so it must delegate
-    assert html.count("window.atlasAskBound = true") == 1
+    assert html.count("window.lanxangAskBound = true") == 1

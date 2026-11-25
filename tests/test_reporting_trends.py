@@ -1,4 +1,4 @@
-from lanxang.intelligence.context import AtlasEnvironmentContext
+from lanxang.intelligence.context import LanxangEnvironmentContext
 from lanxang.knowledge.store import KnowledgeStore
 from lanxang.reporting.trends import build_trends_payload
 
@@ -14,7 +14,7 @@ def test_build_trends_payload_reports_host_and_container_summaries(temp_db):
 
     for cpu_value in (10.0, 20.0, 30.0):
 
-        environment = AtlasEnvironmentContext()
+        environment = LanxangEnvironmentContext()
 
         environment.update("monitoring", {
             "metrics": {"cpu_percent": cpu_value, "memory_percent": None},
@@ -40,7 +40,7 @@ def test_build_trends_payload_reports_guest_summaries(temp_db):
 
     for cpu_value in (0.10, 0.20, 0.30):
 
-        environment = AtlasEnvironmentContext()
+        environment = LanxangEnvironmentContext()
 
         environment.update("virtualization", {
             "nodes": [],
@@ -68,7 +68,7 @@ def test_build_trends_payload_respects_limit(temp_db):
 
     for cpu_value in (10.0, 20.0, 30.0, 40.0):
 
-        environment = AtlasEnvironmentContext()
+        environment = LanxangEnvironmentContext()
         environment.update("monitoring", {"metrics": {"cpu_percent": cpu_value}, "containers": {}})
         store.save_environment(environment)
 

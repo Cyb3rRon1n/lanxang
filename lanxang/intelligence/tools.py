@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Callable
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.knowledge.queries import KnowledgeQueries
 
 
@@ -90,7 +90,7 @@ def _search_container_logs(arguments):
     )
 
 
-def _host_health_handler(config: AtlasConfig):
+def _host_health_handler(config: LanxangConfig):
 
     def handler(arguments):
 
@@ -101,7 +101,7 @@ def _host_health_handler(config: AtlasConfig):
     return handler
 
 
-def _jellyfin_handler(config: AtlasConfig, what):
+def _jellyfin_handler(config: LanxangConfig, what):
 
     def handler(arguments):
 
@@ -122,7 +122,7 @@ def _jellyfin_handler(config: AtlasConfig, what):
     return handler
 
 
-def _notes_handler(config: AtlasConfig):
+def _notes_handler(config: LanxangConfig):
 
     def handler(arguments):
 
@@ -135,7 +135,7 @@ def _notes_handler(config: AtlasConfig):
     return handler
 
 
-def _proxmox_handler(config: AtlasConfig):
+def _proxmox_handler(config: LanxangConfig):
 
     def handler(arguments):
 
@@ -164,7 +164,7 @@ def _proxmox_handler(config: AtlasConfig):
     return handler
 
 
-def _monitoring_handler(config: AtlasConfig):
+def _monitoring_handler(config: LanxangConfig):
 
     def handler(arguments):
 
@@ -219,7 +219,7 @@ def _when(value):
     return value.isoformat() if hasattr(value, "isoformat") else value
 
 
-def _posture_handler(config: AtlasConfig):
+def _posture_handler(config: LanxangConfig):
 
     def handler(arguments):
 
@@ -248,7 +248,7 @@ def _posture_handler(config: AtlasConfig):
     return handler
 
 
-def _devices_handler(config: AtlasConfig):
+def _devices_handler(config: LanxangConfig):
 
     def handler(arguments):
 
@@ -270,7 +270,7 @@ def _devices_handler(config: AtlasConfig):
     return handler
 
 
-def _alerts_handler(config: AtlasConfig):
+def _alerts_handler(config: LanxangConfig):
 
     def handler(arguments):
 
@@ -291,7 +291,7 @@ def _alerts_handler(config: AtlasConfig):
     return handler
 
 
-def _disks_handler(config: AtlasConfig):
+def _disks_handler(config: LanxangConfig):
 
     def handler(arguments):
 
@@ -310,7 +310,7 @@ def _disks_handler(config: AtlasConfig):
     return handler
 
 
-def _uptime_handler(config: AtlasConfig):
+def _uptime_handler(config: LanxangConfig):
 
     def handler(arguments):
 
@@ -333,7 +333,7 @@ def _uptime_handler(config: AtlasConfig):
     return handler
 
 
-def _internet_view_handler(config: AtlasConfig):
+def _internet_view_handler(config: LanxangConfig):
 
     def handler(arguments):
 
@@ -349,7 +349,7 @@ def _internet_view_handler(config: AtlasConfig):
     return handler
 
 
-def build_tools(config: AtlasConfig) -> dict[str, ToolDefinition]:
+def build_tools(config: LanxangConfig) -> dict[str, ToolDefinition]:
     """
     Read-only tools an AI provider can call mid-request to pull live
     data beyond whatever fixed snapshot it was handed. Deliberately

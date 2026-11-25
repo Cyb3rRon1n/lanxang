@@ -71,7 +71,7 @@ def test_broken_files_never_stop_atlas(env, isolated_cwd):
     (isolated_cwd / "inventory").mkdir()
     (isolated_cwd / "inventory" / "settings.yaml").write_text(": not [yaml")
     (isolated_cwd / "inventory" / "secrets.json").write_text("{nope")
-    assert load_config().name == "atlas-node"
+    assert load_config().name == "lanxang-node"
 
 
 def test_secret_values_never_reach_the_settings_file(env, isolated_cwd):

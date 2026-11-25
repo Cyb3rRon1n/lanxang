@@ -15,7 +15,7 @@ def test_format_new_message_is_bold_headline_and_short_lines():
 
     assert text.splitlines()[0] == "**🆕 2 new devices on the network**"
     assert "• Pixel-7 (192.168.50.88)" in text
-    assert text.rstrip().endswith("Triage them in atlas.")
+    assert text.rstrip().endswith("Triage them in Lanxang.")
 
 
 def test_format_offline_message():

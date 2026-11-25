@@ -1,8 +1,8 @@
 """
-/metrics: what atlas knows, in Prometheus text format, for Grafana and friends. Read-only, built from what the
+/metrics: what Lanxang knows, in Prometheus text format, for Grafana and friends. Read-only, built from what the
 checks already saved (nothing is measured on request). A source that isn't set up, or can't be read, is left out.
 
-Access: the usual sign-in, or atlas's read-only API token (the one dashboards like Homepage use) as
+Access: the usual sign-in, or Lanxang's read-only API token (the one dashboards like Homepage use) as
 `Authorization: Bearer <token>`, so a Prometheus server can scrape without a browser session.
 """
 

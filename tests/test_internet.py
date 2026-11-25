@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.monitoring import internet
 from lanxang.monitoring.uptime import UptimeStore
 from lanxang.web.uptime_page import internet_data, render_uptime_page
@@ -29,7 +29,7 @@ def test_outage_runs_and_which_side():
 
 def test_run_alerts_on_the_drop_and_the_way_back(temp_db):
     store, sent = UptimeStore(temp_db), []
-    settings = AtlasConfig()
+    settings = LanxangConfig()
     t = datetime(2026, 11, 16, 12)
     states = [True, False, False, False, True]
     for i, up in enumerate(states):

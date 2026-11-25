@@ -10,7 +10,7 @@ import pytest
 from lanxang import notify
 from lanxang.config.models import EmailNotifyConfig, NotifyConfig, NtfyNotifyConfig
 
-TEXT = "**🆕 New device on the network**\n• **Pixel-7** (192.0.2.8)\n\nTriage them in atlas."
+TEXT = "**🆕 New device on the network**\n• **Pixel-7** (192.0.2.8)\n\nTriage them in Lanxang."
 
 
 @pytest.fixture

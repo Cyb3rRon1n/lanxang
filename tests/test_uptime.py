@@ -6,7 +6,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import pytest
 
 from lanxang.alerts import AlertStore
-from lanxang.config.models import AtlasConfig, UptimeCheck
+from lanxang.config.models import LanxangConfig, UptimeCheck
 from lanxang.monitoring.uptime import UptimeStore, probe, run, valid_target
 from lanxang.web import uptime_page
 
@@ -52,7 +52,7 @@ def test_valid_target():
 
 
 def settings():
-    return AtlasConfig(uptime={"checks": [{"name": "Media", "target": "https://media.example.org"}], "fail_after": 2})
+    return LanxangConfig(uptime={"checks": [{"name": "Media", "target": "https://media.example.org"}], "fail_after": 2})
 
 
 def test_down_after_two_failures_then_back_up_with_duration(temp_db):

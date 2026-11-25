@@ -3,11 +3,11 @@ from pathlib import Path
 import yaml
 
 from lanxang.config import local
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.clock import utcnow
 
 
-def write_config(config: AtlasConfig, path=None):
+def write_config(config: LanxangConfig, path=None):
 
     path = path or local.config_file()
 

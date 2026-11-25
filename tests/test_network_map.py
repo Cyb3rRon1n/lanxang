@@ -1,7 +1,7 @@
 import socket
 from unittest.mock import MagicMock
 
-from lanxang.config.models import AtlasConfig, MapHost
+from lanxang.config.models import LanxangConfig, MapHost
 from lanxang.discovery.topology import collect_topology
 from lanxang.web.network_page import classify, render_network_page
 
@@ -45,7 +45,7 @@ def test_topology_groups_by_network_and_vpn_sharing_and_checks_lan():
     listener.listen()
     port = listener.getsockname()[1]
 
-    config = AtlasConfig()
+    config = LanxangConfig()
     config.name = "media-server"
     config.map.hosts = [MapHost(name="laptop", address="127.0.0.1", role="GPU", ports=[port])]
     config.proxmox.enabled = True
@@ -68,7 +68,7 @@ def test_topology_groups_by_network_and_vpn_sharing_and_checks_lan():
 
 def test_topology_without_docker_or_proxmox():
 
-    topo = collect_topology(AtlasConfig())
+    topo = collect_topology(LanxangConfig())
 
     assert topo["docker"] == {"available": False, "networks": {}}
     assert topo["responsibility"]["proxmox_guests"] == ""
@@ -76,15 +76,15 @@ def test_topology_without_docker_or_proxmox():
 
 def test_latest_topology_skips_rows_other_commands_saved(temp_db):
 
-    from lanxang.intelligence.context import AtlasEnvironmentContext
+    from lanxang.intelligence.context import LanxangEnvironmentContext
     from lanxang.knowledge.queries import KnowledgeQueries
     from lanxang.knowledge.store import KnowledgeStore
 
-    with_map = AtlasEnvironmentContext()
+    with_map = LanxangEnvironmentContext()
     with_map.update("topology", {"host": "media-server"})
     KnowledgeStore().save_environment(with_map)
 
-    later = AtlasEnvironmentContext()
+    later = LanxangEnvironmentContext()
     later.update("virtualization", {"guests": []})
     KnowledgeStore().save_environment(later)
 
@@ -97,7 +97,7 @@ ROUTES = [{"name": "jf", "hosts": ["jellyfin.example.com"], "entrypoints": ["web
 
 def test_classify_internet_home_background_and_vpn():
 
-    topo = collect_topology(AtlasConfig(), docker_client=_docker())
+    topo = collect_topology(LanxangConfig(), docker_client=_docker())
     lanes = classify(topo, ROUTES)
 
     assert [i["name"] for i in lanes["internet"]] == ["jellyfin"] and lanes["internet"][0]["protection"] == "own"
@@ -110,7 +110,7 @@ def test_classify_internet_home_background_and_vpn():
 
 def test_network_page_lanes_tree_chips_and_escaping():
 
-    topo = collect_topology(AtlasConfig(), docker_client=_docker())
+    topo = collect_topology(LanxangConfig(), docker_client=_docker())
     topo["docker"]["networks"]["stack_default"][0]["name"] = "<script>x</script>"
     graph = {"nodes": [{"data": {"id": "internet", "label": "Internet"}},
                        {"data": {"id": "d1", "label": "router", "device_id": 1, "status": "seen", "kind": "router"}},

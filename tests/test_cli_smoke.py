@@ -33,7 +33,7 @@ def test_config_shows_defaults(isolated_cwd):
     result = runner.invoke(app, ["config"])
 
     assert result.exit_code == 0
-    assert "atlas-node" in result.output
+    assert "lanxang-node" in result.output
 
 
 def test_config_hides_secrets(isolated_cwd):
@@ -293,7 +293,7 @@ def test_analyze_json_with_no_environment_prints_null(isolated_cwd, temp_db):
 
 def test_analyze_json_prints_result_and_exits_zero(isolated_cwd, temp_db):
 
-    from lanxang.intelligence.context import AtlasEnvironmentContext
+    from lanxang.intelligence.context import LanxangEnvironmentContext
     from lanxang.intelligence.providers.base import (
         AIProvider,
         AnalysisResult,
@@ -302,7 +302,7 @@ def test_analyze_json_prints_result_and_exits_zero(isolated_cwd, temp_db):
     )
     from lanxang.knowledge.store import KnowledgeStore
 
-    environment = AtlasEnvironmentContext()
+    environment = LanxangEnvironmentContext()
 
     environment.update(
         "containers",
@@ -348,12 +348,12 @@ def test_analyze_json_prints_result_and_exits_zero(isolated_cwd, temp_db):
 
 def test_analyze_json_with_ai_provider_error_exits_one(isolated_cwd, temp_db):
 
-    from lanxang.intelligence.context import AtlasEnvironmentContext
+    from lanxang.intelligence.context import LanxangEnvironmentContext
     from lanxang.intelligence.providers.base import AIProvider
     from lanxang.intelligence.providers import AIProviderError
     from lanxang.knowledge.store import KnowledgeStore
 
-    environment = AtlasEnvironmentContext()
+    environment = LanxangEnvironmentContext()
     KnowledgeStore().save_environment(environment)
 
     class FailingProvider(AIProvider):
@@ -379,7 +379,7 @@ def test_analyze_json_with_plan_reports_it_without_running_it(isolated_cwd, temp
     plan is reported in the payload; nothing gets executed.
     """
 
-    from lanxang.intelligence.context import AtlasEnvironmentContext
+    from lanxang.intelligence.context import LanxangEnvironmentContext
     from lanxang.intelligence.providers.base import (
         AIProvider,
         AnalysisResult,
@@ -390,7 +390,7 @@ def test_analyze_json_with_plan_reports_it_without_running_it(isolated_cwd, temp
     from lanxang.knowledge.store import KnowledgeStore
     from lanxang.knowledge.queries import KnowledgeQueries
 
-    environment = AtlasEnvironmentContext()
+    environment = LanxangEnvironmentContext()
 
     environment.update(
         "containers",
@@ -450,10 +450,10 @@ def test_analyze_prints_suggested_action_for_known_container_only(
     the (mocked) AI provider return one recommendation targeting that
     real container and one targeting a container Atlas never observed
     ('ghost'). Only the grounded suggestion should be printed - this
-    exercises the real AtlasAnalyzer cross-check, not a mocked one.
+    exercises the real LanxangAnalyzer cross-check, not a mocked one.
     """
 
-    from lanxang.intelligence.context import AtlasEnvironmentContext
+    from lanxang.intelligence.context import LanxangEnvironmentContext
     from lanxang.intelligence.providers.base import (
         AIProvider,
         AnalysisResult,
@@ -462,7 +462,7 @@ def test_analyze_prints_suggested_action_for_known_container_only(
     )
     from lanxang.knowledge.store import KnowledgeStore
 
-    environment = AtlasEnvironmentContext()
+    environment = LanxangEnvironmentContext()
 
     environment.update(
         "containers",
@@ -513,7 +513,7 @@ def test_analyze_prints_suggested_stop_command_for_known_container(
     isolated_cwd, temp_db
 ):
 
-    from lanxang.intelligence.context import AtlasEnvironmentContext
+    from lanxang.intelligence.context import LanxangEnvironmentContext
     from lanxang.intelligence.providers.base import (
         AIProvider,
         AnalysisResult,
@@ -522,7 +522,7 @@ def test_analyze_prints_suggested_stop_command_for_known_container(
     )
     from lanxang.knowledge.store import KnowledgeStore
 
-    environment = AtlasEnvironmentContext()
+    environment = LanxangEnvironmentContext()
 
     environment.update(
         "containers",
@@ -562,7 +562,7 @@ def test_analyze_prints_suggested_stop_command_for_known_container(
 
 def test_analyze_prints_suggested_plan_with_numbered_steps(isolated_cwd, temp_db):
 
-    from lanxang.intelligence.context import AtlasEnvironmentContext
+    from lanxang.intelligence.context import LanxangEnvironmentContext
     from lanxang.intelligence.providers.base import (
         AIProvider,
         AnalysisResult,
@@ -572,7 +572,7 @@ def test_analyze_prints_suggested_plan_with_numbered_steps(isolated_cwd, temp_db
     )
     from lanxang.knowledge.store import KnowledgeStore
 
-    environment = AtlasEnvironmentContext()
+    environment = LanxangEnvironmentContext()
 
     environment.update(
         "containers",
@@ -633,7 +633,7 @@ def _analyze_with_plan(monkeypatch_input, sonarr_status="running"):
     provider, invoked with the given scripted input.
     """
 
-    from lanxang.intelligence.context import AtlasEnvironmentContext
+    from lanxang.intelligence.context import LanxangEnvironmentContext
     from lanxang.intelligence.providers.base import (
         AIProvider,
         AnalysisResult,
@@ -643,7 +643,7 @@ def _analyze_with_plan(monkeypatch_input, sonarr_status="running"):
     )
     from lanxang.knowledge.store import KnowledgeStore
 
-    environment = AtlasEnvironmentContext()
+    environment = LanxangEnvironmentContext()
 
     environment.update(
         "containers",
@@ -752,7 +752,7 @@ def test_analyze_confirms_plan_executes_all_steps_and_logs_events(
 
 def test_analyze_plan_step_failure_stops_remaining_steps(isolated_cwd, temp_db):
 
-    from lanxang.intelligence.context import AtlasEnvironmentContext
+    from lanxang.intelligence.context import LanxangEnvironmentContext
     from lanxang.intelligence.providers.base import (
         AIProvider,
         AnalysisResult,
@@ -762,7 +762,7 @@ def test_analyze_plan_step_failure_stops_remaining_steps(isolated_cwd, temp_db):
     )
     from lanxang.knowledge.store import KnowledgeStore
 
-    environment = AtlasEnvironmentContext()
+    environment = LanxangEnvironmentContext()
 
     environment.update(
         "containers",
@@ -1108,7 +1108,7 @@ def test_chat_keeps_assistant_reply_in_messages_when_notes_are_configured(
     isolated_cwd, temp_db
 ):
     """
-    AtlasAgent.converse() may hand the provider a *copy* of messages
+    LanxangAgent.converse() may hand the provider a *copy* of messages
     (e.g. _with_notes() copies before the provider appends its own
     assistant turn to that copy) - the CLI's own messages list must
     still carry the assistant turn itself, the same "append it
@@ -1141,7 +1141,7 @@ def test_chat_keeps_assistant_reply_in_messages_when_notes_are_configured(
         "lanxang.cli.ai.get_provider",
         return_value=MagicMock()
     ), patch(
-        "lanxang.cli.ai.AtlasAgent",
+        "lanxang.cli.ai.LanxangAgent",
         return_value=fake_agent
     ):
 
@@ -1188,7 +1188,7 @@ def test_chat_drops_failed_question_from_messages_on_provider_error(
         "lanxang.cli.ai.get_provider",
         return_value=MagicMock()
     ), patch(
-        "lanxang.cli.ai.AtlasAgent",
+        "lanxang.cli.ai.LanxangAgent",
         return_value=fake_agent
     ):
 
@@ -1214,14 +1214,14 @@ def test_trends_when_no_monitoring_history_prints_hint(isolated_cwd, temp_db):
 
 def test_trends_prints_host_and_container_summaries(isolated_cwd, temp_db):
 
-    from lanxang.intelligence.context import AtlasEnvironmentContext
+    from lanxang.intelligence.context import LanxangEnvironmentContext
     from lanxang.knowledge.store import KnowledgeStore
 
     store = KnowledgeStore()
 
     for cpu_value in (10.0, 20.0, 30.0):
 
-        environment = AtlasEnvironmentContext()
+        environment = LanxangEnvironmentContext()
 
         environment.update("monitoring", {
             "metrics": {"cpu_percent": cpu_value, "memory_percent": None},
@@ -1230,7 +1230,7 @@ def test_trends_prints_host_and_container_summaries(isolated_cwd, temp_db):
 
         store.save_environment(environment)
 
-    discover_only = AtlasEnvironmentContext()
+    discover_only = LanxangEnvironmentContext()
     discover_only.ingest_discovery({"system": {"hostname": "homelab"}})
     store.save_environment(discover_only)
 
@@ -1255,14 +1255,14 @@ def test_trends_json_when_no_monitoring_history(isolated_cwd, temp_db):
 
 def test_trends_json_reports_host_and_container_summaries(isolated_cwd, temp_db):
 
-    from lanxang.intelligence.context import AtlasEnvironmentContext
+    from lanxang.intelligence.context import LanxangEnvironmentContext
     from lanxang.knowledge.store import KnowledgeStore
 
     store = KnowledgeStore()
 
     for cpu_value in (10.0, 20.0, 30.0):
 
-        environment = AtlasEnvironmentContext()
+        environment = LanxangEnvironmentContext()
 
         environment.update("monitoring", {
             "metrics": {"cpu_percent": cpu_value, "memory_percent": None},
@@ -1298,14 +1298,14 @@ def test_trends_shows_guest_section_from_proxmox_scan_only_history(
     had before it also considered virtualization data.
     """
 
-    from lanxang.intelligence.context import AtlasEnvironmentContext
+    from lanxang.intelligence.context import LanxangEnvironmentContext
     from lanxang.knowledge.store import KnowledgeStore
 
     store = KnowledgeStore()
 
     for cpu_value in (0.10, 0.20, 0.30):
 
-        environment = AtlasEnvironmentContext()
+        environment = LanxangEnvironmentContext()
 
         environment.update("virtualization", {
             "nodes": [],
@@ -1336,14 +1336,14 @@ def test_trends_shows_guest_section_from_proxmox_scan_only_history(
 
 def test_trends_json_reports_guest_summaries(isolated_cwd, temp_db):
 
-    from lanxang.intelligence.context import AtlasEnvironmentContext
+    from lanxang.intelligence.context import LanxangEnvironmentContext
     from lanxang.knowledge.store import KnowledgeStore
 
     store = KnowledgeStore()
 
     for cpu_value in (0.10, 0.20, 0.30):
 
-        environment = AtlasEnvironmentContext()
+        environment = LanxangEnvironmentContext()
 
         environment.update("virtualization", {
             "nodes": [],
@@ -2460,7 +2460,7 @@ def test_report_json_prints_inventory_without_writing_markdown(isolated_cwd):
     payload = json.loads(result.output)
 
     assert payload["system"]["hostname"] == "homelab"
-    assert not (isolated_cwd / "reports" / "atlas-report.md").exists()
+    assert not (isolated_cwd / "reports" / "lanxang-report.md").exists()
 
 
 def test_fleet_doctor_with_no_nodes_configured(isolated_cwd, temp_db):

@@ -1,13 +1,13 @@
 from lanxang.config.loader import load_config
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 
 
 def test_load_config_defaults_when_no_file(isolated_cwd):
 
     config = load_config()
 
-    assert config == AtlasConfig()
-    assert config.name == "atlas-node"
+    assert config == LanxangConfig()
+    assert config.name == "lanxang-node"
     assert config.intelligence.provider == "none"
     assert config.intelligence.model == ""                  # no AI: no model
 

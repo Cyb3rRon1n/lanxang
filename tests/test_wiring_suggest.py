@@ -1,7 +1,7 @@
 import socket
 import threading
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.devices import snmpprobe
 from lanxang.wiring.snmp import _caps
 from lanxang.wiring.suggest import suggestions
@@ -55,7 +55,7 @@ DEVICES = [
 
 
 def test_suggestions_combine_signals_and_skip_known_or_dismissed():
-    settings = AtlasConfig(wiring={"switches": [{"name": "core", "host": "192.0.2.2"}], "not_managed": ["192.0.2.40"]})
+    settings = LanxangConfig(wiring={"switches": [{"name": "core", "host": "192.0.2.2"}], "not_managed": ["192.0.2.40"]})
     ports = {"snmp": {"192.0.2.20": {"vendor": "Netgear"}, "192.0.2.30": {"vendor": "Synology"},
                       "192.0.2.2": {"vendor": "Cisco"}, "192.0.2.40": {"vendor": "TP-Link"}}}
     snapshot = {"nodes": [], "unread": [{"switch": "s:core", "port": "gi5", "mac": "aa:bb:cc:00:00:20",

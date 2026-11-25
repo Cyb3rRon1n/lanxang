@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from lanxang.config.models import AtlasConfig, HealthConfig
+from lanxang.config.models import LanxangConfig, HealthConfig
 from lanxang.monitoring import disks
 from lanxang.proxmox.discovery import discover_node_storage, smart_numbers
 from lanxang.web.home_page import build_storage
@@ -61,7 +61,7 @@ def test_alerts_once_per_problem_and_once_when_it_clears(temp_db):
     from lanxang.posture.store import PostureStore
 
     store, sent = PostureStore(temp_db), []
-    settings = AtlasConfig()
+    settings = LanxangConfig()
     t = datetime(2026, 11, 17, 9)
     scans = [_disk(), _disk(temp=75), _disk(temp=76), _disk(temp=77, bad=4), _disk(temp=50, bad=4),
              _disk(health="FAILED", life=8)]
@@ -99,7 +99,7 @@ def test_a_failed_read_neither_clears_nor_re_alerts(temp_db):
     from lanxang.posture.store import PostureStore
 
     store, sent = PostureStore(temp_db), []
-    settings = AtlasConfig()
+    settings = LanxangConfig()
     t = datetime(2026, 11, 17, 9)
     scans = [[_disk(temp=75)], [_disk(temp=76, health="FAILED")],
              [_disk(temp=None, health="")],                         # SMART and health didn't come back

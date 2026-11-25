@@ -14,7 +14,7 @@ import pytest
 from pydantic import ValidationError
 
 from lanxang.clock import stamp
-from lanxang.config.models import AtlasConfig, DisplayConfig
+from lanxang.config.models import LanxangConfig, DisplayConfig
 from lanxang.web import render
 from lanxang.web.render import TIME_SCRIPT, friendly_time, render_page, when
 
@@ -25,7 +25,7 @@ NY = "America/New_York"
 
 def test_defaults_and_validation():
     assert DisplayConfig().model_dump() == {"clock": "24h", "time_zone": "browser", "date_format": "iso"}
-    assert AtlasConfig().display == DisplayConfig()
+    assert LanxangConfig().display == DisplayConfig()
     assert DisplayConfig(time_zone=" Asia/Vientiane ").time_zone == "Asia/Vientiane"
     for bad in ({"clock": "13h"}, {"date_format": "ymd"}):
         with pytest.raises(ValidationError):
@@ -64,7 +64,7 @@ def test_unparseable_times_in_messages():
         def set_status(self, *a, **k):
             pass
 
-    settings = AtlasConfig(display=SHOWN.model_dump(), uptime={"heartbeats": [{"name": "Backup"}]},
+    settings = LanxangConfig(display=SHOWN.model_dump(), uptime={"heartbeats": [{"name": "Backup"}]},
                            dns_filter={"enabled": True, "url": "http://192.0.2.2"})
     sent = []
     beat = Store({"ping:Backup": {"detail": {"at": "garbage", "failed": True}}})
@@ -125,9 +125,9 @@ def test_panel_time_section():
 
 @pytest.fixture
 def server(temp_db, isolated_cwd):
-    from lanxang.web.server import AtlasWebHandler
+    from lanxang.web.server import LanxangWebHandler
 
-    httpd = ThreadingHTTPServer(("127.0.0.1", 0), AtlasWebHandler)
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), LanxangWebHandler)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
     thread.start()
     try:
@@ -215,9 +215,9 @@ def test_weekly_summary_text():
     from lanxang.monitoring import summary
 
     empty = {key: (lambda *a: None) for key in ("internet_rows", "uptime_summary", "devices", "alerts", "statuses", "disks")}
-    text = summary.build(AtlasConfig(display=SHOWN.model_dump()), NOW, empty)
+    text = summary.build(LanxangConfig(display=SHOWN.model_dump()), NOW, empty)
     assert text.splitlines()[1] == "11/10/2026 to 11/17/2026, sent 7:00 AM EST"
-    assert summary.build(AtlasConfig(), NOW, empty).splitlines()[1] == "2026-11-10 to 2026-11-17, sent 12:00 UTC"
+    assert summary.build(LanxangConfig(), NOW, empty).splitlines()[1] == "2026-11-10 to 2026-11-17, sent 12:00 UTC"
 
 
 def test_cert_and_dns_alert_text():

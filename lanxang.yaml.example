@@ -8,9 +8,9 @@ inventory:
 proxmox:
   enabled: false
   host: 192.168.1.10
-  user: atlas@pve
+  user: lanxang@pve
   password: ''
-  token_name: atlas-token
+  token_name: lanxang-token
   token_value: ''
   verify_ssl: false
 intelligence:
@@ -56,7 +56,7 @@ fleet:
 # notify:
 #   ntfy: {url: https://ntfy.sh, topic: my-homelab-a8f3k2}
 #   webhooks: [https://discord.com/api/webhooks/123/abc]
-#   email: {host: smtp.example.com, port: 587, user: atlas@example.com, to: [me@example.com]}
+#   email: {host: smtp.example.com, port: 587, user: lanxang@example.com, to: [me@example.com]}
 #   apprise: [tgram://bottoken/ChatID]
 # Sign-in for the web page: builtin = Lanxang's own admin password (first visit asks for the
 # setup code from `docker compose logs atlas`); proxy = Authelia/Authentik/... in front does it.

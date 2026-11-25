@@ -24,7 +24,7 @@ from lanxang.proxmox import (
     restart_guest,
     stop_guest,
 )
-from lanxang.events import AtlasEvent
+from lanxang.events import LanxangEvent
 from lanxang.knowledge.queries import KnowledgeQueries
 from lanxang.knowledge.store import KnowledgeStore
 from lanxang.core.application import application
@@ -159,7 +159,7 @@ CPU / Memory:
             console.print()
 
             runtime.events.publish(
-                AtlasEvent(
+                LanxangEvent(
                     event_type="atlas.proxmox.changes_detected",
                     source="ProxmoxScan",
                     payload={"changes": changes}
@@ -189,7 +189,7 @@ CPU / Memory:
         console.print(f"[yellow]Disk health check failed:[/yellow] {error}")
 
     runtime.events.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.proxmox.scan.completed",
             source="ProxmoxScan",
             payload=data
@@ -277,7 +277,7 @@ def restart_guest_command(vmid: int):
     runtime = application.runtime
 
     runtime.events.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.action.guest_restarted",
             source="ProxmoxRestartAction",
             payload={
@@ -382,7 +382,7 @@ def stop_guest_command(vmid: int):
     runtime = application.runtime
 
     runtime.events.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.action.guest_stopped",
             source="ProxmoxStopAction",
             payload={
@@ -514,7 +514,7 @@ def resize_guest_command(
     runtime = application.runtime
 
     runtime.events.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.action.guest_resized",
             source="ProxmoxResizeAction",
             payload={
@@ -608,7 +608,7 @@ def restart_libvirt_guest_command(
     runtime = application.runtime
 
     runtime.events.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.action.libvirt_guest_restarted",
             source="LibvirtRestartAction",
             payload={
@@ -693,7 +693,7 @@ def stop_libvirt_guest_command(
     runtime = application.runtime
 
     runtime.events.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.action.libvirt_guest_stopped",
             source="LibvirtStopAction",
             payload={
@@ -796,7 +796,7 @@ def resize_libvirt_guest_command(
     runtime = application.runtime
 
     runtime.events.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.action.libvirt_guest_resized",
             source="LibvirtResizeAction",
             payload={

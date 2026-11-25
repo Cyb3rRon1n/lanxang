@@ -7,9 +7,9 @@ from http.server import ThreadingHTTPServer
 
 import pytest
 
-from lanxang.intelligence.context import AtlasEnvironmentContext
+from lanxang.intelligence.context import LanxangEnvironmentContext
 from lanxang.knowledge.store import KnowledgeStore
-from lanxang.web.server import AtlasWebHandler, same_origin
+from lanxang.web.server import LanxangWebHandler, same_origin
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ def running_server(temp_db):
     infrastructure dependency, just this process talking to itself.
     """
 
-    httpd = ThreadingHTTPServer(("127.0.0.1", 0), AtlasWebHandler)
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), LanxangWebHandler)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
     thread.start()
 
@@ -91,7 +91,7 @@ def test_overview_route_with_no_data(running_server):
 def test_overview_route_with_real_saved_environment(running_server):
 
     store = KnowledgeStore()
-    environment = AtlasEnvironmentContext()
+    environment = LanxangEnvironmentContext()
     environment.ingest_discovery({"system": {"hostname": "homelab"}})
     store.save_environment(environment)
 

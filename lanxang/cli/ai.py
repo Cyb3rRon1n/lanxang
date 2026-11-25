@@ -6,12 +6,12 @@ from dataclasses import asdict
 import typer
 from lanxang.actions import ACTIONS, PLAN_STEP_EVENT_TYPES, execute_action
 from lanxang.config import load_config
-from lanxang.events import AtlasEvent
+from lanxang.events import LanxangEvent
 from lanxang.knowledge.queries import KnowledgeQueries
 from lanxang.knowledge.store import KnowledgeStore
 from lanxang.core.application import application
-from lanxang.intelligence.agent import AtlasAgent
-from lanxang.intelligence.analyzer import AtlasAnalyzer
+from lanxang.intelligence.agent import LanxangAgent
+from lanxang.intelligence.analyzer import LanxangAnalyzer
 from lanxang.intelligence.providers import AIProviderError, get_provider
 from lanxang.intelligence.tools import build_tools
 
@@ -95,7 +95,7 @@ def analyze(
 
         provider = get_provider(settings.intelligence)
 
-        analyzer = AtlasAnalyzer(provider)
+        analyzer = LanxangAnalyzer(provider)
 
         tools = build_tools(settings)
 
@@ -226,7 +226,7 @@ def analyze(
                 step_result = execute_action(step.action)
 
                 application.runtime.events.publish(
-                    AtlasEvent(
+                    LanxangEvent(
                         event_type=PLAN_STEP_EVENT_TYPES[step.action.type],
                         source="PlanStep",
                         payload={
@@ -269,9 +269,9 @@ def analyze(
     runtime = application.runtime
 
     runtime.events.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.analysis.completed",
-            source="AtlasAnalyzer",
+            source="LanxangAnalyzer",
             payload={
                 "provider": settings.intelligence.provider,
                 "model": settings.intelligence.model,
@@ -307,7 +307,7 @@ def chat():
 
         return
 
-    agent = AtlasAgent(provider, settings)
+    agent = LanxangAgent(provider, settings)
 
     console.print(
         "Ask about your infrastructure. Type 'exit' to quit.\n"
@@ -430,7 +430,7 @@ def chat():
                     step_result = execute_action(step.action)
 
                     application.runtime.events.publish(
-                        AtlasEvent(
+                        LanxangEvent(
                             event_type=(
                                 PLAN_STEP_EVENT_TYPES[step.action.type]
                             ),
@@ -471,9 +471,9 @@ def chat():
         runtime = application.runtime
 
         runtime.events.publish(
-            AtlasEvent(
+            LanxangEvent(
                 event_type="atlas.chat.transcript_saved",
-                source="AtlasChat",
+                source="LanxangChat",
                 payload={"messages": transcript}
             )
         )

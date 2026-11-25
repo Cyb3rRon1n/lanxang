@@ -4,7 +4,7 @@ import re
 import yaml
 
 from lanxang.config import local
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 
 
 # ${NAME} / ${NAME:-default} - lets a stack keep secrets in its .env and
@@ -55,7 +55,7 @@ def read_user_config():
 def build_config(web_settings, environ=None):
     """The config that the config file plus these web settings would give - the Setup page tests and validates with it."""
 
-    return AtlasConfig(**_expand_values(local.layered(read_user_config(), web_settings), environ))
+    return LanxangConfig(**_expand_values(local.layered(read_user_config(), web_settings), environ))
 
 
 def load_config():

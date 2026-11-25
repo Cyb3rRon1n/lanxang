@@ -8,7 +8,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.x509.oid import NameOID
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.posture.certs import assess, due, fetch, hosts, level, run
 from lanxang.posture.model import build_posture
 from lanxang.posture.store import PostureStore
@@ -113,7 +113,7 @@ def test_run_daily_alerts_and_posture_payload(temp_db):
     store, sent = PostureStore(temp_db), []
     store.save_routes([{"name": "media", "hosts": ["media.example.org"], "entrypoints": [],
                         "protection": "authelia", "provider": "docker"}], NOW)
-    settings = AtlasConfig(security={"cert_hosts": ["mail.example.org"]})
+    settings = LanxangConfig(security={"cert_hosts": ["mail.example.org"]})
     answers = {"media.example.org": result(5), "mail.example.org": result(200)}
     get = lambda host, timeout: answers[host]
     texts, detail = run(settings, store, NOW, get=get, send=sent.append)
@@ -124,5 +124,5 @@ def test_run_daily_alerts_and_posture_payload(temp_db):
 
 
 def test_cert_watch_settings():
-    security = AtlasConfig(security={"cert_watch": False, "cert_warn_days": 30}).security
+    security = LanxangConfig(security={"cert_watch": False, "cert_warn_days": 30}).security
     assert security.cert_watch is False and security.cert_warn_days == 30 and security.cert_urgent_days == 3

@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.devices import lanwatch
 from lanxang.devices.lanwatch import alerts, assess, build_discover, parse_offer, probe_dhcp, run
 from lanxang.posture.model import build_posture
@@ -138,7 +138,7 @@ def files(arp):
 
 
 def test_run_stores_status_alerts_and_trust(temp_db):
-    store, sent, settings = PostureStore(temp_db), [], AtlasConfig()
+    store, sent, settings = PostureStore(temp_db), [], LanxangConfig()
     probe = lambda timeout: [{"server": GW, "offered": "192.0.2.50", "router": GW}]
 
     run(settings, store, NOW, probe=probe, read=files({GW: GW_MAC}), send=sent.append)
@@ -161,7 +161,7 @@ def test_run_stores_status_alerts_and_trust(temp_db):
 def test_probe_error_is_reported_not_alerted(temp_db):
     def probe(timeout):
         raise PermissionError("binding UDP port 68 needs root")
-    detail = run(AtlasConfig(), PostureStore(temp_db), NOW, probe=probe, read=files({GW: GW_MAC}), send=pytest.fail)
+    detail = run(LanxangConfig(), PostureStore(temp_db), NOW, probe=probe, read=files({GW: GW_MAC}), send=pytest.fail)
     assert "port 68" in detail["probe_error"] and detail["issues"] == []
 
 
@@ -183,7 +183,7 @@ def test_helper_used_when_port_68_is_privileged(monkeypatch):
 
 
 def test_a_blind_run_keeps_open_problems_instead_of_resolving_them(temp_db):
-    store, sent, settings = PostureStore(temp_db), [], AtlasConfig()
+    store, sent, settings = PostureStore(temp_db), [], LanxangConfig()
     rogue = lambda timeout: [{"server": GW, "offered": "192.0.2.50", "router": GW},
                              {"server": "192.0.2.66", "offered": "192.0.2.51", "router": "192.0.2.66"}]
 

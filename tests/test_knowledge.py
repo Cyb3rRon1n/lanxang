@@ -2,8 +2,8 @@ from sqlalchemy import create_engine
 
 import lanxang.knowledge.queries as queries_module
 import lanxang.knowledge.store as store_module
-from lanxang.events import AtlasEvent
-from lanxang.intelligence.context import AtlasEnvironmentContext
+from lanxang.events import LanxangEvent
+from lanxang.intelligence.context import LanxangEnvironmentContext
 from lanxang.intelligence.providers.base import (
     AnalysisResult,
     Recommendation,
@@ -23,7 +23,7 @@ def test_save_and_query_events(temp_db):
     store = KnowledgeStore()
 
     store.save_event(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.discovery.completed",
             source="test",
             payload={"ok": True}
@@ -44,7 +44,7 @@ def test_latest_event_payload_picks_newest_of_type(temp_db):
 
     for event_type, payload in (("atlas.proxmox.scan.completed", {"n": 1}), ("other", {"n": 2}),
                                 ("atlas.proxmox.scan.completed", {"n": 3})):
-        store.save_event(AtlasEvent(event_type=event_type, source="test", payload=payload))
+        store.save_event(LanxangEvent(event_type=event_type, source="test", payload=payload))
 
     assert KnowledgeQueries().latest_event_payload("atlas.proxmox.scan.completed") == {"n": 3}
 
@@ -54,7 +54,7 @@ def test_saved_event_keeps_its_own_time(temp_db):
 
     from datetime import datetime
 
-    KnowledgeStore().save_event(AtlasEvent("atlas.host.sample", "test", {"cpu": 5}, timestamp=datetime(2026, 1, 2, 3, 4)))
+    KnowledgeStore().save_event(LanxangEvent("atlas.host.sample", "test", {"cpu": 5}, timestamp=datetime(2026, 1, 2, 3, 4)))
 
     assert KnowledgeQueries().events_since(["atlas.host.sample"], datetime(2026, 1, 1)) == [
         (datetime(2026, 1, 2, 3, 4), {"cpu": 5})]
@@ -67,7 +67,7 @@ def test_latest_environment_none_when_nothing_stored(temp_db):
 
 def test_save_and_query_environment(temp_db):
 
-    environment = AtlasEnvironmentContext()
+    environment = LanxangEnvironmentContext()
 
     environment.ingest_discovery(
         {"system": {"hostname": "homelab"}}
@@ -89,11 +89,11 @@ def test_environment_history_returns_rows_most_recent_first(temp_db):
 
     store = KnowledgeStore()
 
-    first = AtlasEnvironmentContext()
+    first = LanxangEnvironmentContext()
     first.ingest_discovery({"system": {"hostname": "first"}})
     store.save_environment(first)
 
-    second = AtlasEnvironmentContext()
+    second = LanxangEnvironmentContext()
     second.ingest_discovery({"system": {"hostname": "second"}})
     store.save_environment(second)
 
@@ -110,7 +110,7 @@ def test_environment_history_respects_limit(temp_db):
 
     for index in range(5):
 
-        environment = AtlasEnvironmentContext()
+        environment = LanxangEnvironmentContext()
         environment.ingest_discovery({"system": {"hostname": str(index)}})
         store.save_environment(environment)
 
@@ -248,7 +248,7 @@ def test_latest_environment_fills_parts_the_newest_save_left_empty(temp_db):
     store = KnowledgeStore()
     for part in ({"system": {"hostname": "homelab"}, "containers": {"web": 1}}, {"system": {"hostname": "newer"}},
                  {"topology": {"lan": []}}):
-        environment = AtlasEnvironmentContext()
+        environment = LanxangEnvironmentContext()
         for key, value in part.items():
             environment.update(key, value)                             # what the commands do
         store.save_environment(environment)

@@ -4,7 +4,7 @@ import urllib.request
 from datetime import datetime
 from http.server import ThreadingHTTPServer
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.web.metrics import collect, render
 
 NOW = datetime(2026, 11, 17, 12)
@@ -24,7 +24,7 @@ def _sources():
 
 
 def test_prometheus_text_from_what_atlas_saved():
-    settings = AtlasConfig(uptime={"checks": [{"name": "Media", "target": "https://media.example.org"}]},
+    settings = LanxangConfig(uptime={"checks": [{"name": "Media", "target": "https://media.example.org"}]},
                            dns_filter={"enabled": True, "url": "http://192.0.2.53"})
     text = render(collect(settings, NOW, _sources()))
     for line in ('atlas_uptime_up{check="Media"} 1', 'atlas_uptime_response_ms{check="Media"} 12.5',
@@ -42,18 +42,18 @@ def test_prometheus_text_from_what_atlas_saved():
 def test_broken_sources_are_left_out():
     def boom(*a):
         raise RuntimeError("db gone")
-    text = render(collect(AtlasConfig(), NOW, {"uptime": boom, "devices": boom, "alerts": boom, "statuses": boom,
+    text = render(collect(LanxangConfig(), NOW, {"uptime": boom, "devices": boom, "alerts": boom, "statuses": boom,
                                                "disks": boom}))
     assert text.strip() == ""
 
 
 def test_metrics_needs_sign_in_or_the_api_token(temp_db, isolated_cwd):
     from lanxang.web.auth import Auth
-    from lanxang.web.server import AtlasWebHandler
+    from lanxang.web.server import LanxangWebHandler
 
     auth = Auth(isolated_cwd / "auth.json")
     auth.set_password("correct horse battery staple")
-    handler = type("Handler", (AtlasWebHandler,), {"auth": auth})
+    handler = type("Handler", (LanxangWebHandler,), {"auth": auth})
     httpd = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     url = f"http://127.0.0.1:{httpd.server_port}/metrics"

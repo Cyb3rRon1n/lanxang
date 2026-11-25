@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from lanxang.config.models import AtlasConfig, HomeAssistantConfig
+from lanxang.config.models import LanxangConfig, HomeAssistantConfig
 from lanxang.monitoring import homeassistant as ha
 from lanxang.web.home_page import render_home_page
 
@@ -81,7 +81,7 @@ def test_alerts_once_and_when_fine_again(temp_db):
     from lanxang.posture.store import PostureStore
 
     store, sent = PostureStore(temp_db), []
-    settings = AtlasConfig(homeassistant={"enabled": True, "url": "http://192.0.2.80:8123"})
+    settings = LanxangConfig(homeassistant={"enabled": True, "url": "http://192.0.2.80:8123"})
     lost = {"version": "x", "offline": [{"name": "Porch camera", "hours": 30, "kinds": ["camera"]}],
             "batteries": [{"name": "Front door lock", "level": 12}], "updates": []}
     fine = {"version": "x", "offline": [], "batteries": [], "updates": []}

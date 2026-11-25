@@ -49,7 +49,7 @@ def probe(target, timeout=10.0):
     start = time.monotonic()
     try:
         if target.startswith(("http://", "https://")):
-            request = urllib.request.Request(target, headers={"User-Agent": "atlas-uptime"})
+            request = urllib.request.Request(target, headers={"User-Agent": "lanxang-uptime"})
             try:
                 with urllib.request.urlopen(request, timeout=timeout, context=ssl._create_unverified_context()) as reply:
                     status = reply.status

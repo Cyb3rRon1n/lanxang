@@ -1,18 +1,18 @@
 from lanxang.actions import is_action_grounded
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.intelligence.providers import AIProvider, ChatReply
 from lanxang.intelligence.tools import build_tools, execute_tool
 
 
-class AtlasAgent:
+class LanxangAgent:
     """
     Runs a multi-turn conversation through an AI provider's tool-use
     loop, backing lanxang chat. Plays the same orchestration role
-    AtlasAnalyzer plays for lanxang analyze's single-shot flow, but for
+    LanxangAnalyzer plays for lanxang analyze's single-shot flow, but for
     an ongoing session that has no guaranteed prior lanxang discover.
     """
 
-    def __init__(self, provider: AIProvider, config: AtlasConfig):
+    def __init__(self, provider: AIProvider, config: LanxangConfig):
 
         self.provider = provider
         self.config = config
@@ -36,7 +36,7 @@ class AtlasAgent:
         ):
 
             # Same "drop the whole plan on one bad step" rule
-            # AtlasAnalyzer applies - see its analyze() for why.
+            # LanxangAnalyzer applies - see its analyze() for why.
             reply.plan = None
 
         if reply.plan and reply.action:

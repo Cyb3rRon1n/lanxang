@@ -1,7 +1,7 @@
 """
 SNMP source: any managed switch that speaks the standard MIBs (IF-MIB, LLDP-MIB,
 BRIDGE-MIB / Q-BRIDGE-MIB). Shells out to net-snmp's snmpbulkwalk - the same
-"call the system tool" choice atlas made for ssh and virsh - so there is no
+"call the system tool" choice Lanxang made for ssh and virsh - so there is no
 compiled Python dependency. Passphrases go through a private snmp.conf
 (SNMPCONFPATH), never argv, where any local `ps` could read them.
 """

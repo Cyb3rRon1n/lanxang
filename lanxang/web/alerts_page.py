@@ -1,5 +1,5 @@
 """
-The Alerts page (/alerts): every problem atlas's checks see, in one place - what needs action, what is only
+The Alerts page (/alerts): every problem Lanxang's checks see, in one place - what needs action, what is only
 being watched, and what resolved in the last week. Each row links to the page to investigate it on.
 """
 

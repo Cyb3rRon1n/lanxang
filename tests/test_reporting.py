@@ -14,7 +14,7 @@ def test_generate_report_writes_expected_sections(isolated_cwd):
     output = generate_report(SAMPLE_INVENTORY)
 
     assert output.exists()
-    assert output.resolve() == isolated_cwd / "reports" / "atlas-report.md"
+    assert output.resolve() == isolated_cwd / "reports" / "lanxang-report.md"
 
     content = output.read_text()
 

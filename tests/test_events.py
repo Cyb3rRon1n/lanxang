@@ -1,4 +1,4 @@
-from lanxang.events import AtlasEvent, EventBus
+from lanxang.events import LanxangEvent, EventBus
 
 
 def test_subscriber_receives_matching_event():
@@ -11,7 +11,7 @@ def test_subscriber_receives_matching_event():
         received.append
     )
 
-    event = AtlasEvent(
+    event = LanxangEvent(
         event_type="atlas.discovery.completed",
         source="test",
         payload={"ok": True}
@@ -33,7 +33,7 @@ def test_subscriber_does_not_receive_other_event_types():
     )
 
     bus.publish(
-        AtlasEvent(
+        LanxangEvent(
             event_type="atlas.plugin.loaded",
             source="test",
             payload={}
@@ -50,8 +50,8 @@ def test_wildcard_subscriber_receives_every_event():
 
     bus.subscribe("*", received.append)
 
-    first = AtlasEvent(event_type="a", source="test", payload=1)
-    second = AtlasEvent(event_type="b", source="test", payload=2)
+    first = LanxangEvent(event_type="a", source="test", payload=1)
+    second = LanxangEvent(event_type="b", source="test", payload=2)
 
     bus.publish(first)
     bus.publish(second)
@@ -61,7 +61,7 @@ def test_wildcard_subscriber_receives_every_event():
 
 def test_event_gets_default_timestamp():
 
-    event = AtlasEvent(
+    event = LanxangEvent(
         event_type="atlas.plugin.loaded",
         source="test",
         payload={}

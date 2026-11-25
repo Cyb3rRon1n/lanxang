@@ -194,7 +194,7 @@ def build_wiring(switches, unifi, devices, cabling):
             if target is None:
                 if neighbor["chassis_mac"]:
                     lldp_host[(node_id, neighbor["port"])] = neighbor["chassis_mac"]
-                    if neighbor.get("caps"):      # a switch/router/AP atlas can't read yet: Setup suggests it
+                    if neighbor.get("caps"):      # a switch/router/AP Lanxang can't read yet: Setup suggests it
                         name, device_id, ip = name_for(neighbor["chassis_mac"])
                         unread.append({"switch": node_id, "port": neighbor["port"], "mac": neighbor["chassis_mac"],
                                        "sys_name": neighbor["sys_name"], "caps": neighbor["caps"], "ip": ip,

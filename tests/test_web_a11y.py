@@ -282,7 +282,7 @@ def test_saving_the_time_zone_reloads_activity():
 
 def test_viewer_zone_cookie_must_name_a_real_zone():
     from types import SimpleNamespace
-    from lanxang.web.server import AtlasWebHandler
-    zone = lambda cookie: AtlasWebHandler._viewer_zone(SimpleNamespace(headers={"Cookie": cookie}))
+    from lanxang.web.server import LanxangWebHandler
+    zone = lambda cookie: LanxangWebHandler._viewer_zone(SimpleNamespace(headers={"Cookie": cookie}))
     assert zone("lanxang-tz=America%2FNew_York") == "America/New_York"
     assert zone("lanxang-tz=Not%2FA_Zone") is None and zone("lanxang-tz=..%2F..%2Fetc") is None and zone("") is None

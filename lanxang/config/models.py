@@ -266,8 +266,8 @@ class SecurityConfig(BaseModel):
 
 
 class WebConfig(BaseModel):
-    # builtin: atlas asks for its own admin password (lanxang.web.auth).
-    # proxy: an auth proxy (Authelia, Authentik, ...) in front of atlas does it - atlas checks nothing.
+    # builtin: Lanxang asks for its own admin password (lanxang.web.auth).
+    # proxy: an auth proxy (Authelia, Authentik, ...) in front of Lanxang does it - Lanxang checks nothing.
     auth: Literal["builtin", "proxy"] = "builtin"
     # Peers whose X-Forwarded-For names the visitor (for the wrong-password limit): loopback and Docker's networks.
     trusted_proxies: list[str] = ["127.0.0.0/8", "::1/128", "172.16.0.0/12"]
@@ -282,12 +282,12 @@ class UptimeCheck(BaseModel):
 class Heartbeat(BaseModel):
     name: str
     every_minutes: int = 1440       # how often the job runs (a nightly backup: 1440)
-    grace_minutes: int = 60         # how late it may be before atlas says so
+    grace_minutes: int = 60         # how late it may be before Lanxang says so
 
 
 class UptimeConfig(BaseModel):
     checks: list[UptimeCheck] = []      # also added from the web Servers > Uptime page
-    heartbeats: list[Heartbeat] = []    # jobs that ping atlas when they finish (lanxang.monitoring.heartbeat)
+    heartbeats: list[Heartbeat] = []    # jobs that ping Lanxang when they finish (lanxang.monitoring.heartbeat)
     fail_after: int = 2                 # failures in a row before a check counts as down (1 a minute)
 
 
@@ -387,8 +387,8 @@ def zone_problem(value):
     return None
 
 
-class AtlasConfig(BaseModel):
-    name: str = "atlas-node"
+class LanxangConfig(BaseModel):
+    name: str = "lanxang-node"
     discovery: DiscoveryConfig = DiscoveryConfig()
     inventory: InventoryConfig = InventoryConfig()
     proxmox: ProxmoxConfig = ProxmoxConfig()

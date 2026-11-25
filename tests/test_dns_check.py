@@ -3,7 +3,7 @@ import struct
 import threading
 from datetime import datetime, timedelta
 
-from lanxang.config.models import AtlasConfig, InternetConfig
+from lanxang.config.models import LanxangConfig, InternetConfig
 from lanxang.monitoring import internet
 from lanxang.monitoring.uptime import UptimeStore
 
@@ -52,7 +52,7 @@ def test_one_row_per_server_or_the_system_resolver():
 
 def test_dns_alerts_only_while_the_internet_is_up(temp_db):
     store, sent = UptimeStore(temp_db), []
-    settings = AtlasConfig()
+    settings = LanxangConfig()
     t = datetime(2026, 11, 17, 12)
     up, dead = (lambda *a: (True, 10.0, "3 of 3 answered")), (lambda *a: (False, None, "no answer"))
     dns_ok = lambda config: {"DNS": (True, 5.0, "found example.com")}
@@ -75,7 +75,7 @@ def test_no_dns_all_clear_after_an_outage_that_never_announced_it(temp_db):
     dns_bad = lambda config: {"DNS": (False, None, "SERVFAIL")}
     steps = [(up, dns_ok)] + [(dead, dns_bad)] * 4 + [(up, dns_ok)]
     for i, (net, dns) in enumerate(steps):
-        internet.run(AtlasConfig(), store, t + timedelta(minutes=i), internet=net, router=lambda gw: None, dns=dns,
+        internet.run(LanxangConfig(), store, t + timedelta(minutes=i), internet=net, router=lambda gw: None, dns=dns,
                      send=sent.append)
 
     assert [text.key for text in sent] == ["internet:down", "internet:down"]                 # down, back - nothing else

@@ -1,7 +1,7 @@
 
 import pytest
 
-from lanxang.config.models import AtlasConfig
+from lanxang.config.models import LanxangConfig
 from lanxang.wiring import WiringError
 from lanxang.wiring.scan import WiringBusy, run_scan, _LOCK
 from lanxang.wiring.store import WiringStore
@@ -13,7 +13,7 @@ SWITCH_RESULT = {"name": "core-switch", "host": "192.0.2.2", "sys_name": "core-s
 
 
 def _settings(tmp_path):
-    return AtlasConfig(wiring={"enabled": True, "cabling_file": str(tmp_path / "cabling.yaml"),
+    return LanxangConfig(wiring={"enabled": True, "cabling_file": str(tmp_path / "cabling.yaml"),
                                "switches": [{"name": "core-switch", "host": "192.0.2.2", "priv": "des"}]})
 
 

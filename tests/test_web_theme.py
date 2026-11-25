@@ -20,7 +20,7 @@ def test_shell_has_side_menu_sub_pages_and_both_themes():
     html = render_page("Cabling", "<p>x</p>", active="cabling")
     assert '<aside class="side">' in html and 'href="/devices" aria-current="page" title="Network"' in html
     assert 'class="tabs"' in html and 'href="/cabling" aria-current="page">Cabling<' in html
-    assert ':root[data-theme="dark"]' in html and "atlasTheme()" in html and "atlas-theme" in html
+    assert ':root[data-theme="dark"]' in html and "lanxangTheme()" in html and "atlas-theme" in html
     assert html.count('class="ic"') >= 8      # every main nav item carries an icon (the collapsed sidebar needs it)
     assert render_page("Setup", "", active="settings").count('class="tabs"') == 0    # no sub-pages, no list
 
