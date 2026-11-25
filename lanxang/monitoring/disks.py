@@ -57,6 +57,11 @@ def run(settings, store, now, nodes, host_names=None, *, source="disks", send=No
             hot_limit = health.disk_hot_hdd_c if disk.get("type") == "hdd" else health.disk_hot_ssd_c
             now_problems = problems(disk, health, was_hot=(before.get("temp") or 0) >= hot_limit)
             label = _label(host, disk)
+            # a reading that didn't come back this time keeps what the last one said, instead of clearing and re-alerting
+            unread = {"hot": disk.get("temp") is None, "failed": disk.get("health") in ("", "UNKNOWN", None),
+                      "worn": disk.get("life") is None and not disk.get("worn")}
+            now_problems |= {kind: (_TITLE[kind], NOT_READ) for kind in before.get("problems") or []
+                             if kind not in now_problems and unread.get(kind)}
             for kind, (title, detail) in now_problems.items():
                 found.append(issue(kind, key, f"Disk {label} {title}", detail, href="/?home"))
                 if kind not in (before.get("problems") or []):
@@ -67,7 +72,18 @@ def run(settings, store, now, nodes, host_names=None, *, source="disks", send=No
                 texts.append(Text(f"**💽 Disk {label}: bad sectors went from {before['bad']} to {disk['bad']}**\n"
                                   "• a disk that keeps adding them is wearing out - check the pool and keep backups "
                                   "current", f"disks:bad:{key}"))
-            seen[key] = {"temp": disk.get("temp"), "bad": disk.get("bad"), "problems": sorted(now_problems)}
+            temp = disk.get("temp") if disk.get("temp") is not None else before.get("temp")
+            seen[key] = {"temp": temp, "bad": disk.get("bad") if disk.get("bad") is not None else before.get("bad"),
+                         "problems": sorted(now_problems), "label": label}
+
+    # a node whose disk list didn't come back (API blip, node down): keep its disks as they were, problems still open
+    read = {node.get("name") for node in nodes if node.get("disks")}
+    for key, before in old.items():
+        if key in seen or key.partition(":")[0] in read:
+            continue
+        seen[key] = before
+        for kind in before.get("problems") or []:
+            found.append(issue(kind, key, f"Disk {before.get('label') or key} {_TITLE[kind]}", NOT_READ, href="/?home"))
 
     report(source, found, now, store)
     for text in texts:
@@ -83,3 +99,5 @@ def run(settings, store, now, nodes, host_names=None, *, source="disks", send=No
 
 
 _PAST = {"failed": "failing SMART", "hot": "running hot", "worn": "worn out"}
+_TITLE = {"failed": "is failing its SMART check", "hot": "is running hot", "worn": "is nearly worn out"}
+NOT_READ = "not read at the last scan - still shown as it was last seen"

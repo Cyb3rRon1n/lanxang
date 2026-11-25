@@ -72,3 +72,19 @@ def test_scan_reports_cable_health_and_alerts_once(temp_db, tmp_path):
     assert len(sent) == 1                                     # still bad: no repeat alert
     run_scan(settings, WiringStore(), [], env={}, collect=lambda *a, **k: switch(800, 200_000), send=sent.append)
     assert len(sent) == 2 and "healthy again" in sent[-1]
+
+
+def test_a_switch_not_read_keeps_its_cable_problems(temp_db, tmp_path):
+    settings = _settings(tmp_path)
+    half = {**SWITCH_RESULT, "ports": {"gi5": {"index": 53, "up": True, "speed": 1000, "alias": "",
+                                               "counters": {"duplex": "half", "packets": 1}}}}
+
+    def broken(*a, **k):
+        raise WiringError("core-switch: Timeout: No Response from 192.0.2.2")
+
+    sent = []
+    run_scan(settings, WiringStore(), [], env={}, collect=lambda *a, **k: SWITCH_RESULT, send=sent.append)
+    for collect in (lambda *a, **k: half, broken, lambda *a, **k: half):
+        result = run_scan(settings, WiringStore(), [], env={}, collect=collect, send=sent.append)
+        assert [i["kind"] for i in result["snapshot"]["health"]] == ["duplex"]
+    assert len(sent) == 1 and "healthy again" not in sent[0]

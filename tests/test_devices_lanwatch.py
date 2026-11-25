@@ -180,3 +180,20 @@ def test_helper_used_when_port_68_is_privileged(monkeypatch):
     monkeypatch.setattr(lanwatch.shutil, "which", lambda name: None)
     with pytest.raises(PermissionError, match="helper"):
         lanwatch.probe_with_helper(1.0, run=fake_run)
+
+
+def test_a_blind_run_keeps_open_problems_instead_of_resolving_them(temp_db):
+    store, sent, settings = PostureStore(temp_db), [], AtlasConfig()
+    rogue = lambda timeout: [{"server": GW, "offered": "192.0.2.50", "router": GW},
+                             {"server": "192.0.2.66", "offered": "192.0.2.51", "router": "192.0.2.66"}]
+
+    def failing(timeout):
+        raise OSError("probe timed out")
+
+    run(settings, store, NOW, probe=rogue, read=files({GW: GW_MAC}), send=sent.append)
+    run(settings, store, NOW, probe=rogue, read=files({GW: EVIL}), send=sent.append)       # and a spoofed gateway
+    assert len(sent) == 2
+    for probe, arp in ((failing, {GW: EVIL}), (lambda timeout: [], {}), (rogue, {GW: EVIL})):
+        detail = run(settings, store, NOW, probe=probe, read=files(arp), send=sent.append)
+        assert {i["kind"] for i in detail["issues"]} == {"rogue_dhcp", "gateway_mac"}
+    assert len(sent) == 2                                       # no "Resolved", no second alert

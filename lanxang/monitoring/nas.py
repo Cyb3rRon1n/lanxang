@@ -237,12 +237,14 @@ def run(settings, store, now, *, get=fetch, send=None):
     if error:
         found.append(issue("read", host, f"Can't read the NAS {host}", error, "watch", "/settings#nas"))
         bad = was_bad                                  # can't tell: keep what we knew, say nothing new
-    else:
+    for pool in info.get("pools") or []:               # on a failed read, the last good read keeps its pools open
+        if pool.get("health") not in HEALTHY_POOL and (not error or pool["name"] in was_bad):
+            found.append(issue("pool", f"{host}:{pool['name']}", f"{host} {pool['name']} is {pool['health']}",
+                               "a disk may have dropped out - check the NAS", href="/?home"))
+    if not error:
         for pool in info.get("pools") or []:
             if pool.get("health") not in HEALTHY_POOL:
                 bad.add(pool["name"])
-                found.append(issue("pool", f"{host}:{pool['name']}", f"{host} {pool['name']} is {pool['health']}",
-                                   "a disk may have dropped out - check the NAS", href="/?home"))
                 if pool["name"] not in was_bad:
                     texts.append(Text(f"**💽 {host}: {pool['name']} is {pool['health']}**\n• a disk may have dropped "
                                       "out or failed - check the NAS and keep your backups current",

@@ -126,19 +126,24 @@ def probe_with_helper(timeout=3.0, run=subprocess.run):
 
 # --- checks ----------------------------------------------------------------
 
-def assess(*, offers, probe_error, gateway_ip, arp, clients, allowed, state):
+def assess(*, offers, probe_error, gateway_ip, arp, clients, allowed, state, previous=()):
     """
     Issues for one run plus the state to keep. offers: probe_dhcp() result (None
     when the probe is off); arp: {ip: mac}; clients: UniFi wired clients
     [{mac, ip, name}]; allowed: extra DHCP server IPs; state: what the last run
-    kept ({gateway_mac, silent}). Returns (issues, state).
+    kept ({gateway_mac, silent}); previous: the last run's issues. Returns (issues, state).
     """
 
     issues, state = [], dict(state or {})
+    carry = lambda kinds: issues.extend(i for i in previous or [] if i["kind"] in kinds)
 
     def add(kind, level, subject, detail):
         issues.append({"kind": kind, "level": level, "subject": subject, "reason": REASONS[kind], "detail": detail})
 
+    if probe_error:      # couldn't look this time: what the last probe found still stands (no "Resolved", no re-alert)
+        carry(("rogue_dhcp", "dhcp_down", "dhcp_unheard"))
+    elif offers == []:   # nobody answered in time - a rogue that missed the window isn't gone
+        carry(("rogue_dhcp",))
     if offers is not None and not probe_error:
         expected = set(allowed) | ({gateway_ip} if gateway_ip else set())
         for offer in offers:
@@ -158,6 +163,8 @@ def assess(*, offers, probe_error, gateway_ip, arp, clients, allowed, state):
 
     gateway_mac = arp.get(gateway_ip) if gateway_ip else None
     learned = state.get("gateway_mac")
+    if gateway_ip and not gateway_mac:      # its ARP entry aged out: no new evidence either way
+        carry(("gateway_mac", "shared_mac"))
     if gateway_mac:
         others = sorted(ip for ip, mac in arp.items() if mac == gateway_mac and ip != gateway_ip)
         if learned and gateway_mac != learned:
@@ -223,7 +230,8 @@ def run(settings, store, now, *, probe=probe_with_helper, read=None, unifi_clien
     gateway_ip = default_gateway(read("/proc/net/route"))
     arp = parse_arp(read("/proc/net/arp"))
     issues, state = assess(offers=offers, probe_error=probe_error, gateway_ip=gateway_ip, arp=arp,
-                           clients=unifi_clients, allowed=config.dhcp_servers, state=state)
+                           clients=unifi_clients, allowed=config.dhcp_servers, state=state,
+                           previous=[] if trust_gateway else previous.get("issues"))
 
     from lanxang.alerts import issue, report
     report("lan", [issue(i["kind"], i["subject"], i["reason"], i["detail"],

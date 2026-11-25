@@ -7,7 +7,7 @@ dict(ip, time, method, path, status, service). Lines that don't match are skippe
 
 import ipaddress
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 
 LINE = re.compile(r'^(?P<ip>\S+) \S+ \S+ \[(?P<time>[^\]]+)\] "(?P<method>[A-Z]+) (?P<path>\S*)[^"]*" (?P<status>\d{3}) '
                   r'\S+ "[^"]*" "[^"]*" \d+ "(?P<router>[^"]*)"')
@@ -19,7 +19,7 @@ def parse_line(line):
     if not m:
         return None
     try:
-        when = datetime.strptime(m["time"], "%d/%b/%Y:%H:%M:%S %z").replace(tzinfo=None)
+        when = datetime.strptime(m["time"], "%d/%b/%Y:%H:%M:%S %z").astimezone(timezone.utc).replace(tzinfo=None)
         ipaddress.ip_address(m["ip"])
     except ValueError:
         return None

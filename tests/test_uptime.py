@@ -204,3 +204,21 @@ def test_uptime_hero_counts_the_internet_check(temp_db):
     assert 'class="hero attention"' in down and "Internet down" in down and "All 3" not in down
     up = page(3, True)
     assert 'class="hero ok"' in up and "Internet and all 3 checks up" in up
+
+
+def test_a_port_that_isnt_http_is_down_not_a_crash():
+    server = socket.socket()
+    server.bind(("127.0.0.1", 0))
+    server.listen(1)
+
+    def banner():
+        conn, _ = server.accept()
+        conn.recv(1024)
+        conn.sendall(b"SSH-2.0-OpenSSH_9.6\r\n")
+        conn.close()
+    threading.Thread(target=banner, daemon=True).start()
+
+    ok, ms, detail = probe(f"http://127.0.0.1:{server.getsockname()[1]}/", timeout=3)
+    server.close()
+
+    assert ok is False and ms is None and detail

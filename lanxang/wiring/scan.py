@@ -88,6 +88,8 @@ def run_scan(settings, store, devices, env=None, now=None, collect=collect_switc
         if "unifi" in stale:
             stale |= {d.get("name") for d in ((raw["unifi"] or {}).get("devices") or [])}
         snapshot["health"] = name_attached(assess(raw, [h["raw"] for h in history], stale), snapshot)
+        if previous and stale:      # a switch not read this time keeps its open problems (no "healthy again", no re-alert)
+            snapshot["health"] += [i for i in previous[0]["snapshot"].get("health") or [] if i["device"] in stale]
         snapshot["poe"] = poe_ports(raw)
         taken_at = now or utcnow()
         if previous:                                # per-port traffic since the last scan, for the map and graphs

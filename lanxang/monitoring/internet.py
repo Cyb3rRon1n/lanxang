@@ -62,12 +62,13 @@ def _system(name, timeout):
     """Milliseconds for this machine's own resolver to find name, or None. getaddrinfo has no timeout of its own."""
 
     start = time.monotonic()
-    with ThreadPoolExecutor(max_workers=1) as pool:
-        future = pool.submit(socket.getaddrinfo, name, 443, proto=socket.IPPROTO_TCP)
-        try:
-            future.result(timeout=timeout)
-        except Exception:
-            return None
+    pool = ThreadPoolExecutor(max_workers=1)       # not `with`: its exit would wait for a hung lookup after all
+    try:
+        pool.submit(socket.getaddrinfo, name, 443, proto=socket.IPPROTO_TCP).result(timeout=timeout)
+    except Exception:
+        return None
+    finally:
+        pool.shutdown(wait=False)
     return (time.monotonic() - start) * 1000
 
 
@@ -173,7 +174,8 @@ def run(settings, store, now, *, internet=None, router=None, gateway=None, dns=N
     if router_result:
         results[ROUTER] = router_result
     dns_rows = dns_names(config) if config.dns_name else []
-    dns_was = {row: _down(store, fail_after, row) for row in dns_rows}
+    # as alerted: lookups failing during an outage were never announced, so their recovery isn't either
+    dns_was = {row: _down(store, fail_after, row) and not was_down for row in dns_rows}
     if dns_rows:
         results.update((dns or check_dns)(config))
     store.save(results, now)

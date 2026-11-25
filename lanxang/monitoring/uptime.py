@@ -6,6 +6,7 @@ here. host:port is a plain TCP connect. A check is down after uptime.fail_after 
 then, and one "back up" with how long it was down. Results are kept 30 days.
 """
 
+import http.client
 import socket
 import ssl
 import time
@@ -60,7 +61,7 @@ def probe(target, timeout=10.0):
         with socket.create_connection((host.strip("[]"), int(port)), timeout=timeout):
             pass
         return True, (time.monotonic() - start) * 1000, "port open"
-    except (OSError, ValueError) as error:
+    except (OSError, ValueError, http.client.HTTPException) as error:    # BadStatusLine: e.g. an SSH port on http://
         reason = getattr(error, "reason", None) or error
         return False, None, (str(reason) or type(reason).__name__)[:200]
 

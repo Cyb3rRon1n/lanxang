@@ -153,3 +153,23 @@ def test_home_storage_card_shows_the_nas():
     assert rows[1]["name"] == "nas disks" and "all healthy" in rows[1]["detail"]
     broken = build_storage([], {}, {}, None, nas={"name": "nas", "error": "No answer", "info": {}})
     assert broken["state"] == "warn" and broken["rows"][-1]["detail"] == "can't read it — see Setup"
+
+
+def test_a_failed_read_keeps_a_bad_pool_open(temp_db):
+    from lanxang.alerts import AlertStore
+    from lanxang.posture.store import PostureStore
+
+    store, t = PostureStore(temp_db), datetime(2026, 11, 17, 9)
+    settings = AtlasConfig(nas=_config(name="nas"))
+    bad = lambda c: {"kind": "TrueNAS", "pools": [{"name": "tank", "health": "DEGRADED", "size": 10, "alloc": 5}],
+                     "disks": []}
+
+    def failing(config):
+        raise nas.NasError("No answer")
+
+    nas.run(settings, store, t, get=bad, send=lambda text: None)
+    opened = [a["id"] for a in AlertStore(temp_db).listing(t)["open"] if "tank" in a["title"]]
+    nas.run(settings, store, t + timedelta(minutes=15), get=failing, send=lambda text: None)
+    still = [a["id"] for a in AlertStore(temp_db).listing(t + timedelta(minutes=15))["open"] if "tank" in a["title"]]
+
+    assert opened and still == opened                    # same alert, not resolved and reopened

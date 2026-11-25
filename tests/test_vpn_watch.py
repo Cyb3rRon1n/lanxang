@@ -59,3 +59,19 @@ def test_check_retries_unsent_alert(temp_db):
         check([CLIENT], store, lambda text: (False, "signal down"), FakeSession(None))
     check([CLIENT], store, lambda text: (sent.append(text) or True, ""), FakeSession(None))
     assert len(sent) == 1
+
+
+def test_a_recovery_while_muted_is_not_sent_later(temp_db, monkeypatch):
+    import lanxang.alerts
+    store, sent = AccessStore(temp_db), []
+    send = lambda text: (sent.append(text) or True, "")
+
+    for _ in range(2):
+        check([CLIENT], store, send, FakeSession(None))
+    assert len(sent) == 1
+    with monkeypatch.context() as muted:
+        muted.setattr(lanxang.alerts, "allowed", lambda *a, **k: False)
+        check([CLIENT], store, send, FakeSession())                 # back, while muted
+    check([CLIENT], store, send, FakeSession())                     # mute over
+
+    assert len(sent) == 1                                           # no stale "working again"

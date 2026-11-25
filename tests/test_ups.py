@@ -100,3 +100,19 @@ def test_setup_card_tests_the_ups_server(nut, isolated_cwd, monkeypatch):
     assert status == 200 and body["message"].startswith("Connected: rack on mains power, 100% charged")
     status, body = handle_post("/api/settings/ups/test", {"host": "", "port": nut})
     assert status == 400 and "address" in body["error"]
+
+
+def test_a_blip_during_a_power_cut_keeps_the_alert_open(nut, temp_db):
+    from lanxang.alerts import AlertStore
+
+    settings = AtlasConfig(ups={"enabled": True, "host": "127.0.0.1", "port": nut})
+    store, now = PostureStore(), datetime(2026, 1, 1, 20)
+    STATE.update(status="OB", charge="80", runtime="1200")
+    ups.run(settings, store, now, send=lambda text: None)
+
+    def down(*args):
+        raise OSError("connection refused")
+    ups.run(settings, store, now + timedelta(minutes=1), get=down, send=lambda text: None)
+    STATE.update(status="OL", charge="100", runtime="2400")
+
+    assert any("power cut" in a["title"] for a in AlertStore().listing(now + timedelta(minutes=1))["open"])

@@ -8,6 +8,7 @@ from lanxang.monitoring import internet
 from lanxang.monitoring.uptime import UptimeStore
 
 REAL_ASK = internet._ask          # conftest swaps the module's copy for a stub; this is the real one
+REAL_SYSTEM = internet._system
 
 
 def _fake_server(rcode):
@@ -64,3 +65,29 @@ def test_dns_alerts_only_while_the_internet_is_up(temp_db):
     keys = [text.key for text in sent]
     assert keys == ["internet:dns:DNS", "internet:dns:DNS", "internet:down"]             # failing, works again, down
     assert "Name lookups are failing" in sent[0] and "work again" in sent[1]
+
+
+def test_no_dns_all_clear_after_an_outage_that_never_announced_it(temp_db):
+    store, sent = UptimeStore(temp_db), []
+    t = datetime(2026, 11, 17, 12)
+    up, dead = (lambda *a: (True, 10.0, "3 of 3 answered")), (lambda *a: (False, None, "no answer"))
+    dns_ok = lambda config: {"DNS": (True, 5.0, "found example.com")}
+    dns_bad = lambda config: {"DNS": (False, None, "SERVFAIL")}
+    steps = [(up, dns_ok)] + [(dead, dns_bad)] * 4 + [(up, dns_ok)]
+    for i, (net, dns) in enumerate(steps):
+        internet.run(AtlasConfig(), store, t + timedelta(minutes=i), internet=net, router=lambda gw: None, dns=dns,
+                     send=sent.append)
+
+    assert [text.key for text in sent] == ["internet:down", "internet:down"]                 # down, back - nothing else
+
+
+def test_a_hung_system_lookup_returns_at_the_timeout(monkeypatch):
+    import time
+
+    release = threading.Event()
+    monkeypatch.setattr(socket, "getaddrinfo", lambda *a, **k: release.wait(5))
+    start = time.monotonic()
+    try:
+        assert REAL_SYSTEM("example.com", 0.2) is None and time.monotonic() - start < 1
+    finally:
+        release.set()

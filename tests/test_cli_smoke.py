@@ -2880,3 +2880,12 @@ def test_web_handles_keyboard_interrupt_cleanly(isolated_cwd):
 
     assert result.exit_code == 0
     assert "Stopped." in result.output
+
+
+def test_scan_runs_the_nas_check_even_with_lan_scanning_off(isolated_cwd, temp_db):
+
+    (isolated_cwd / "lanxang.yaml").write_text("scan: {enabled: false}\nnas: {enabled: true, url: https://192.0.2.20}\n")
+    with patch("lanxang.monitoring.nas.run") as nas_run:
+        result = runner.invoke(app, ["scan"])
+
+    assert result.exit_code == 0 and "LAN scanning is off" in result.output and nas_run.called
