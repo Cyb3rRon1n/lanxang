@@ -21,6 +21,9 @@ Docker image is published as `ghcr.io/cyb3rron1n/lanxang:<version>` for every re
   to test the new address.
 
 ### Fixed
+- Deployment docs: the reverse-proxy override example names the `atlas` service (it said `lanxang`, which
+  adds a new, broken service), and the cron and chat examples use `docker compose exec atlas`, which works whatever
+  the containers are called.
 - The speed test card labels its low point "Slowest, 30 days" (it counted tests, not days).
 
 ## 1.5.2 - 2026-11-21

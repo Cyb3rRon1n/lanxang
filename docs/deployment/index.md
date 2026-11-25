@@ -42,7 +42,7 @@ If you run [Homepage](https://gethomepage.dev) (or any dashboard), give Lanxang 
 
 ```yaml
 services:
-  lanxang:
+  atlas:                             # the web service keeps its pre-rename name
     ports: !reset []                 # no host port; Traefik reaches it on the shared network
     networks: [proxy]                # your Traefik network
     labels:
@@ -104,13 +104,13 @@ unhealthy), `containers_running`/`_total`/`_unhealthy`, `guests_running`/`_total
 mappings above.
 
 Keep what the tile shows current with the `atlas-scan` container (started by default alongside
-`lanxang` — nothing extra to do), or one host cron line if you're not running the compose stack:
+the `atlas` web service — nothing extra to do), or one host cron line instead:
 
 ```cron
-*/30 * * * * docker exec atlas lanxang discover >/dev/null 2>&1; docker exec atlas lanxang proxmox scan >/dev/null 2>&1; docker exec atlas lanxang map >/dev/null 2>&1
+*/30 * * * * cd ~/lanxang && for c in discover "proxmox scan" map; do docker compose exec -T atlas lanxang $c >/dev/null 2>&1; done
 ```
 
-Chat lives in the terminal: `docker exec -it atlas lanxang chat` (a one-line `atlas-chat` wrapper script on the host makes it easy to reach from an SSH/Guacamole session). If you use Authelia, make sure admin-only rules end with a `deny` rule for the same domains — a rule whose `subject` doesn't match falls through to the default policy.
+Chat lives in the terminal: `docker compose exec atlas lanxang chat`, run from `~/lanxang` (a one-line `atlas-chat` wrapper script on the host makes it easy to reach from an SSH/Guacamole session). If you use Authelia, make sure admin-only rules end with a `deny` rule for the same domains — a rule whose `subject` doesn't match falls through to the default policy.
 
 ## Posture page
 
