@@ -5,6 +5,14 @@ Docker image is published as `ghcr.io/cyb3rron1n/lanxang:<version>` for every re
 
 ## Unreleased
 
+### Changed
+- An empty `intelligence.model` now means the provider's own default: `claude-opus-5` for anthropic, `qwen3:8b` for
+  ollama (it was `claude-opus-5` for both, which Ollama doesn't have).
+- Dependencies have upper bounds on their next major version (pydantic, SQLAlchemy, Typer, docker, anthropic), so a
+  breaking release can't reach a new image unnoticed.
+- The database is set up once per process instead of on every store, which makes pages lighter.
+- CI lints with ruff (pyflakes only), caches pip, and builds the Docker image on every pull request.
+
 ### Security
 - Sign-in: parallel wrong passwords can no longer slip past the five-guess limit, and only a few password checks run
   at once.
@@ -21,6 +29,8 @@ Docker image is published as `ghcr.io/cyb3rron1n/lanxang:<version>` for every re
   to test the new address.
 
 ### Fixed
+- The installer quotes the host name in `lanxang.yaml`: a host called `on` or `1234` no longer stops Lanxang
+  starting.
 - One odd reply to an uptime check (an SSH port given as `http://...`) no longer stops the whole pass: that check is
   down, the rest are saved and alerted, and the internet and heartbeat checks still run.
 - `lanxang scan` runs the NAS, Home Assistant, Pi-hole/AdGuard, router and summary checks even when LAN scanning is off

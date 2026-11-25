@@ -91,7 +91,7 @@ Controls the AI backend behind `lanxang analyze`.
 | Field | Default | Description |
 |---|---|---|
 | `provider` | `none` | `none`, `ollama` or `anthropic` |
-| `model` | `claude-opus-5` | The Claude model ID, or an Ollama model name (e.g. `llama3.1`) when `provider: ollama` |
+| `model` | per provider | The Claude model ID, or an Ollama model name (e.g. `llama3.1`) when `provider: ollama`. Empty uses `claude-opus-5` for anthropic and `qwen3:8b` for ollama |
 | `ollama_host` | `http://localhost:11434` | Only used when `provider: ollama` |
 | `think` | `false` | Only used when `provider: ollama`. Thinking models such as qwen3 reason silently before answering, which is much slower — `false` keeps replies fast. Set `null` if your Ollama or model rejects the field. |
 

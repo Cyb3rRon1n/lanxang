@@ -131,7 +131,6 @@ def _sources():
         router = dict(uptime.history(internet.ROUTER, since))
         return [(at, ok, router.get(at)) for at, ok in uptime.history(internet.INTERNET, since)]
 
-    from datetime import datetime
     return {**base, "uptime_summary": lambda names: uptime.summary(names, utcnow()),
             "internet_rows": internet_rows}
 

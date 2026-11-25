@@ -1,4 +1,5 @@
 import time
+from pathlib import Path
 
 from sqlalchemy import inspect, text
 from sqlalchemy.exc import OperationalError
@@ -82,6 +83,9 @@ def initialize_database(engine=None):
     if engine is None:
         engine = default_engine
 
+    if _ready_key(engine) in _READY:      # every store calls this; the work is needed once per file per process
+        return
+
     if engine is default_engine:
 
         DATABASE_PATH.parent.mkdir(
@@ -119,6 +123,22 @@ def initialize_database(engine=None):
         connection.execute(text("CREATE INDEX IF NOT EXISTS ix_uptime_name_time ON uptime (name, checked_at)"))
 
     _heal_event_types(engine)
+    if _ready_key(engine):
+        _READY.add(_ready_key(engine))
+
+
+_READY = set()
+
+
+def _ready_key(engine):
+    """The SQLite file this engine writes, while it exists (a deleted file is set up again); None = always set up."""
+
+    database = engine.url.database
+    if engine.url.get_backend_name() != "sqlite" or not database or database == ":memory:":
+        return None
+    path = Path(database).resolve()
+
+    return str(path) if path.exists() else None
 
 
 __all__ = [

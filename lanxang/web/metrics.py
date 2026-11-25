@@ -47,7 +47,7 @@ def _line(name, labels, value):
 def collect(settings, now, sources=None):
     """{metric name: [(labels, value)]} from the stores. sources: test hook replacing the store reads."""
 
-    from lanxang.monitoring import heartbeat, internet
+    from lanxang.monitoring import internet
 
     sources = sources or _sources()
     found = {name: [] for name in HELP}
@@ -132,7 +132,6 @@ def _sources():
         return found
 
     def live_alerts():
-        from datetime import datetime
         listing = alerts.listing(utcnow())
         return listing["open"] + listing["watch"]
 

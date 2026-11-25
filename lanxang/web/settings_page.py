@@ -438,7 +438,7 @@ def _test_network(card, body, config, environ):
         return False, f"Proxmox answered with an error: {error}"
     except RequestException as error:
         if "SSL" in type(error).__name__ or "certificate" in str(error).lower():
-            return False, f"Proxmox's certificate isn't trusted — untick the certificate check for its self-signed one."
+            return False, "Proxmox's certificate isn't trusted — untick the certificate check for its self-signed one."
         return False, f"No answer from Proxmox at {proxmox.host}:8006 — check the host and that it's on."
     return True, f"Connected: Proxmox VE {version}, {len(nodes)} node{'s' * (len(nodes) != 1)}."
 

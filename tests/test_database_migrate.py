@@ -98,9 +98,11 @@ def test_initialize_database_renames_lanxang_event_types_back(tmp_path, monkeypa
     """Images built from main before 1.0 wrote lanxang.* event types; the stored names stay atlas.*."""
 
     monkeypatch.setattr(database_module, "_HEALED", set())
+    monkeypatch.setattr(database_module, "_READY", set())
     engine = create_engine(f"sqlite:///{tmp_path / 'events.db'}")
     initialize_database(engine)
     monkeypatch.setattr(database_module, "_HEALED", set())
+    monkeypatch.setattr(database_module, "_READY", set())
 
     with engine.begin() as connection:
         for kind in ("lanxang.proxmox.scan.completed", "atlas.monitor.completed"):
@@ -110,6 +112,7 @@ def test_initialize_database_renames_lanxang_event_types_back(tmp_path, monkeypa
     seen = _statements(engine)
     initialize_database(engine)
     monkeypatch.setattr(database_module, "_HEALED", set())
+    monkeypatch.setattr(database_module, "_READY", set())
     initialize_database(engine)  # second run is harmless
 
     with engine.connect() as connection:
@@ -123,6 +126,7 @@ def test_event_heal_never_writes_when_nothing_matches_and_runs_once(tmp_path, mo
     """The check is an index read: no UPDATE (no write lock) without lanxang.* rows, and once per process."""
 
     monkeypatch.setattr(database_module, "_HEALED", set())
+    monkeypatch.setattr(database_module, "_READY", set())
     engine = create_engine(f"sqlite:///{tmp_path / 'quiet.db'}")
     seen = _statements(engine)
     initialize_database(engine)
@@ -138,6 +142,7 @@ def test_event_heal_never_writes_when_nothing_matches_and_runs_once(tmp_path, mo
     try:
         busy = create_engine(f"sqlite:///{tmp_path / 'quiet.db'}", connect_args={"timeout": 0})
         monkeypatch.setattr(database_module, "_HEALED", set())
+        monkeypatch.setattr(database_module, "_READY", set())
         initialize_database(busy)
     finally:
         writer.rollback()
@@ -176,4 +181,19 @@ def test_initialize_database_tolerates_a_concurrent_create_all(tmp_path, monkeyp
     assert "events" in inspect(engine).get_table_names()
 
     with engine.begin() as connection:
+        assert connection.execute(text("SELECT count(*) FROM events")).scalar() == 0
+
+
+def test_setup_runs_once_per_file_and_again_if_the_file_goes(tmp_path, monkeypatch):
+    monkeypatch.setattr(database_module, "_READY", set())
+    engine = create_engine(f"sqlite:///{tmp_path / 'once.db'}")
+    initialize_database(engine)
+    seen = _statements(engine)
+    initialize_database(engine)
+    assert seen == []                                    # already set up: no statements at all
+
+    engine.dispose()
+    (tmp_path / "once.db").unlink()
+    initialize_database(engine)
+    with engine.connect() as connection:
         assert connection.execute(text("SELECT count(*) FROM events")).scalar() == 0

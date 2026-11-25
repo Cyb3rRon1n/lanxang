@@ -37,16 +37,16 @@ classifiers = [
 ]
 
 dependencies = [
-    "typer",
+    "typer>=0.12,<1",
     "rich",
-    "pydantic",
+    "pydantic>=2,<3",
     "psutil",
     "pyyaml",
-    "docker",
+    "docker>=7,<8",
     "proxmoxer",
-    "anthropic",
+    "anthropic>=1,<2",
     "requests",
-    "sqlalchemy",
+    "sqlalchemy>=2,<3",
     "paramiko",
     "maxminddb",
     "websocket-client",         # TrueNAS: its API is JSON-RPC over a websocket
@@ -54,7 +54,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-cov", "apprise>=1.9"]   # apprise: so CI runs the real Apprise test
+dev = ["pytest", "pytest-cov", "apprise>=1.9", "ruff"]   # apprise: so CI runs the real Apprise test
 docs = ["mkdocs-material"]
 alerts = ["apprise>=1.9"]   # notify.apprise URLs; the Docker image installs it
 
@@ -70,3 +70,5 @@ lanxang = "lanxang.cli:app"
 [tool.hatch.build.targets.wheel]
 packages = ["lanxang"]
 
+[tool.ruff.lint]
+select = ["F"]          # pyflakes only (unused imports, undefined names): no style rules

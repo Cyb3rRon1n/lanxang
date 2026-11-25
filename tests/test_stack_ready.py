@@ -3,7 +3,6 @@ import threading
 import urllib.request
 from http.server import ThreadingHTTPServer
 
-import pytest
 
 from lanxang.config import loader
 from lanxang.config.loader import expand_env

@@ -7,7 +7,6 @@ import pytest
 
 from lanxang.alerts import AlertStore
 from lanxang.config.models import AtlasConfig, UptimeCheck
-from lanxang.monitoring import uptime
 from lanxang.monitoring.uptime import UptimeStore, probe, run, valid_target
 from lanxang.web import uptime_page
 

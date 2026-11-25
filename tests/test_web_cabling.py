@@ -1,7 +1,7 @@
 import json
 import urllib.error
 import urllib.request
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from lanxang.web.cabling_page import cabling_csv, render_cabling_page
 from lanxang.wiring.build import build_wiring

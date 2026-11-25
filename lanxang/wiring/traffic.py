@@ -5,7 +5,7 @@ port table, so nothing extra is polled. Rates are kept a week in their own table
 each cable on the map carries its current load.
 """
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session

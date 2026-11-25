@@ -2,7 +2,7 @@ import re
 from typing import Literal
 from zoneinfo import ZoneInfo
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, model_validator
 
 
 class DiscoveryConfig(BaseModel):
@@ -25,15 +25,23 @@ class ProxmoxConfig(BaseModel):
     verify_ssl: bool = False
 
 
+DEFAULT_MODELS = {"anthropic": "claude-opus-5", "ollama": "qwen3:8b"}
+
+
 class IntelligenceConfig(BaseModel):
     provider: str = "none"          # AI is optional: none, ollama or anthropic
-    model: str = "claude-opus-5"
+    model: str = ""                 # empty: the provider's own default (DEFAULT_MODELS), as install.sh writes
     ollama_host: str = "http://localhost:11434"
     # Ollama-only: thinking models (e.g. qwen3) reason silently before
     # answering, which is much slower - False keeps replies fast enough for
     # Cloudflare's 100s limit. None omits the field for an Ollama/model
     # combination that rejects it outright.
     think: bool | None = False
+
+    @model_validator(mode="after")
+    def _default_model(self):
+        self.model = self.model or DEFAULT_MODELS.get(self.provider, "")
+        return self
 
 
 class MonitoringConfig(BaseModel):
