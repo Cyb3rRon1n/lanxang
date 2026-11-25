@@ -11,7 +11,6 @@ passes the latest WiringStore row and the diff.
 import csv
 import io
 import json
-from datetime import datetime
 
 from lanxang.config.local import config_name
 from lanxang.web.icons import icon

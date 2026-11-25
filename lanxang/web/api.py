@@ -8,7 +8,6 @@ same persistence path as every other atlas state change.
 
 import re
 import sys
-from datetime import datetime
 from urllib.parse import unquote
 
 import lanxang.web.chat as chat_module

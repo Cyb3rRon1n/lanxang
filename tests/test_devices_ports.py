@@ -85,7 +85,7 @@ def test_unifi_exposure_parsing():
     assert result["upnp"] is False and [f["protocol"] for f in result["forwards"]] == ["tcp", "udp"]
 
 
-DESCRIPTION = f"""<?xml version="1.0"?><root xmlns="urn:schemas-upnp-org:device-1-0"><device><serviceList><service>
+DESCRIPTION = """<?xml version="1.0"?><root xmlns="urn:schemas-upnp-org:device-1-0"><device><serviceList><service>
 <serviceType>urn:schemas-upnp-org:service:WANIPConnection:1</serviceType><controlURL>/ctl/IPConn</controlURL>
 </service></serviceList></device></root>"""
 

@@ -172,8 +172,6 @@ def allowed(owner, text, now=None):
     """True when a message may go out: Text tagged as muted, or any message while paused or in quiet hours, is held.
     Fails open - a broken alert database must never silence a real problem."""
 
-    from datetime import datetime
-
     now = now or utcnow()
     try:
         from lanxang.alerts.quiet import active

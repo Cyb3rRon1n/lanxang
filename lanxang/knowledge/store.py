@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session

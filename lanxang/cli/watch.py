@@ -163,7 +163,6 @@ def lan_scan(
     for important devices gone quiet. Run by the atlas-scan container.
     """
 
-    from datetime import datetime
     from lanxang.devices import lan
     from lanxang.devices.notify import deliver
     from lanxang.devices.store import InventoryStore
@@ -332,7 +331,6 @@ def posture_watch(
     """
 
     import time
-    from datetime import datetime
 
     from lanxang.docker.manager import get_client
     from lanxang.posture.collect import Collector
@@ -414,7 +412,6 @@ def sample():
         except OSError:
             pass
 
-    from datetime import datetime
 
     from lanxang.health.alerts import container_state, run as health_run
     from lanxang.posture.store import PostureStore
@@ -463,7 +460,6 @@ def access_collect(
     every scan cycle; first run starts at the end of the log.
     """
 
-    from datetime import datetime
 
     from lanxang.access.collect import AccessCollector
     from lanxang.access.store import AccessStore
@@ -566,7 +562,6 @@ def ports_check(
     runs it every pass.
     """
 
-    from datetime import datetime
 
     from lanxang.devices.ports import run
     from lanxang.devices.store import InventoryStore
@@ -621,7 +616,6 @@ def certs_check(
     atlas-scan runs it every pass; it only checks once a day.
     """
 
-    from datetime import datetime
 
     from lanxang.posture.certs import run
     from lanxang.posture.store import PostureStore
@@ -741,7 +735,6 @@ def uptime_check(json_output: bool = typer.Option(False, "--json", help="Print t
     a check is down after uptime.fail_after failures in a row, and alerts once then and once when it's back.
     """
 
-    from datetime import datetime
 
     from lanxang.monitoring import internet
     from lanxang.monitoring.uptime import UptimeStore, run
@@ -791,7 +784,6 @@ def ups_check(json_output: bool = typer.Option(False, "--json", help="Print the 
     low, and once when power is back. atlas-scan runs it once a minute; it does nothing until ups.enabled.
     """
 
-    from datetime import datetime
 
     from lanxang.monitoring.ups import STATES, run
     from lanxang.posture.store import PostureStore
@@ -832,7 +824,6 @@ def lan_check(
     atlas-scan runs it every pass.
     """
 
-    from datetime import datetime
 
     from lanxang.devices.lanwatch import run
     from lanxang.posture.store import PostureStore
@@ -950,7 +941,6 @@ def dns_check(json_output: bool = typer.Option(False, "--json", help="Print the 
     too; ad blocking off at two checks in a row sends one alert, and another when it's back on.
     """
 
-    from datetime import datetime
 
     from lanxang.monitoring.dnsfilter import run
     from lanxang.posture.store import PostureStore
@@ -984,7 +974,6 @@ def nas_check(json_output: bool = typer.Option(False, "--json", help="Print the 
     isn't healthy, or a disk that fails, runs hot or wears out, sends one alert, and another when it's fine.
     """
 
-    from datetime import datetime
 
     from lanxang.monitoring.nas import run
     from lanxang.posture.store import PostureStore

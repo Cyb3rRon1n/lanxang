@@ -20,12 +20,32 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
 
-      - name: Install Atlas with dev dependencies
+      - name: Install Lanxang with dev dependencies
         run: pip install -e ".[dev]"
+
+      - name: Lint (pyflakes)
+        run: ruff check lanxang tests tools
 
       - name: Run tests
         run: pytest tests/ -v --cov=lanxang --cov-report=term-missing
 
       - name: Shellcheck the installer
         run: shellcheck -S warning install.sh
+
+  image:
+    # The Dockerfile builds on every pull request (amd64 only, not pushed), so a broken image is caught before main.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

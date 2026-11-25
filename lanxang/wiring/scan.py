@@ -7,7 +7,6 @@ clicks (or a click during a CLI run in the same process) from overlapping.
 
 import os
 import threading
-from datetime import datetime
 
 from lanxang.alerts import Text
 from lanxang.wiring import WiringError, traffic

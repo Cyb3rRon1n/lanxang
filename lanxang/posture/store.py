@@ -8,7 +8,6 @@ which tests/conftest.py's temp_db also patches.
 import ipaddress
 import json
 import re
-from datetime import datetime
 
 from sqlalchemy import delete, select
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert

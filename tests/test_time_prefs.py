@@ -7,7 +7,7 @@ import subprocess
 import threading
 import urllib.error
 import urllib.request
-from datetime import datetime, timedelta
+from datetime import datetime
 from http.server import ThreadingHTTPServer
 
 import pytest
@@ -49,7 +49,6 @@ def test_zone_data_gone_falls_back_to_utc():
 
 
 def test_unparseable_times_in_messages():
-    from types import SimpleNamespace
 
     from lanxang.clock import stamp_text
     from lanxang.monitoring import dnsfilter, heartbeat

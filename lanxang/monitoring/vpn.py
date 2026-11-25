@@ -88,7 +88,6 @@ def check(clients, store, send=None, session=None):
                 state[name]["down"] = False
 
     store.set_state(STATE_KEY, json.dumps(state))
-    from datetime import datetime
     from lanxang.alerts import issue, report
     report("vpn", [issue("vpn", name, f"Torrent client {name} isn't behind its VPN", problem,
                          "problem" if state[name]["fails"] >= FAILS_TO_ALERT else "watch", "/posture")

@@ -184,7 +184,7 @@ else
         cat > "$DIR/lanxang.yaml" <<EOF
 # Written by install.sh - lanxang.yaml.example shows every option. Alerts, the AI model and
 # more can also be set on the web page's Setup tab; anything set here wins over it.
-name: $(hostname -s 2>/dev/null || echo lanxang-node)
+name: '$(h=$(hostname -s 2>/dev/null); printf '%s' "${h:-lanxang-node}" | tr -d "'")'
 discovery:
   hardware: true
   storage: true

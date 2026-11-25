@@ -1,4 +1,3 @@
-from datetime import datetime
 
 from lanxang.core.application import application
 from lanxang.devices import Sighting

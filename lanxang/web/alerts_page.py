@@ -4,7 +4,6 @@ being watched, and what resolved in the last week. Each row links to the page to
 """
 
 import re
-from datetime import datetime
 
 from lanxang.config.local import config_name
 from lanxang.web.icons import icon
@@ -168,7 +167,7 @@ def _quiet_hours(notify, now):
             'aria-label="From" required> to <input name="end" type="time" value="07:00" aria-label="Until" required>'
             '<button type="submit">Add quiet hours</button></form>')
     return (f'<details class="quiet"{" open" if windows else ""}><summary>Quiet hours'
-            + (f" — on now" if on else f" ({len(windows)})" if windows else "") + '</summary>'
+            + (" — on now" if on else f" ({len(windows)})" if windows else "") + '</summary>'
             '<p class="muted">No messages go out in these windows (problems still show here), e.g. while the '
             f'Sunday updates run. Times are {_esc(zone)}.</p>'
             + (f"<ul>{items}</ul>" if items else "") + form + "</details>")

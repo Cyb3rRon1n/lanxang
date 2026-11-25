@@ -160,7 +160,8 @@ python -m pytest tests/
 python -m lanxang.cli.main <command> # the CLI from source; `lanxang web` serves the pages
 ```
 
-No linter or formatter is configured. Match the style of the file you are editing. The history of design
+`ruff check lanxang tests tools` runs pyflakes only (unused imports, undefined names), as CI does; there is no
+formatter. Match the style of the file you are editing. The history of design
 decisions lives in [docs/development/design-notes.md](docs/development/design-notes.md); read the section for the
 area you are changing before you change it.
 

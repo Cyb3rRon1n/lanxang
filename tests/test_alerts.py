@@ -77,7 +77,6 @@ def test_cabling_scan_reports_into_alerts(temp_db):
 
 
 def test_ack_mute_pause_and_allowed(temp_db):
-    from lanxang.alerts import Text
 
     store = AlertStore(temp_db)
     store.sync("lan", [issue("rogue_dhcp", "192.0.2.9", "Another DHCP server", href="/posture")], NOW)

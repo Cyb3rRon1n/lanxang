@@ -1076,7 +1076,7 @@ def test_chat_exiting_immediately_does_not_save_a_transcript(
     isolated_cwd, temp_db
 ):
 
-    from lanxang.intelligence.providers.base import AIProvider, ChatReply
+    from lanxang.intelligence.providers.base import AIProvider
 
     class FakeProvider(AIProvider):
 

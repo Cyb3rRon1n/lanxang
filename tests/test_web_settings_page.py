@@ -8,7 +8,6 @@ import pytest
 
 from lanxang.config import local
 from lanxang.config.loader import load_config
-from lanxang.web import settings_page
 from lanxang.web.settings_page import handle_post, render_settings_page
 
 

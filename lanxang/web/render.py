@@ -8,10 +8,8 @@ pure renderers; the write path (device edit/merge/split) lives in api.py
 and server.py.
 """
 
-from datetime import datetime, timezone
 from html import escape
 
-from lanxang.devices.store import CONNECTIONS, KINDS, STATES
 from lanxang.health.alerts import container_state
 from lanxang.web.icons import icon
 from lanxang.web.blocks import BLOCKS_STYLE
@@ -871,18 +869,18 @@ def render_history_page(events, today=None, changes="", viewer_zone=None):
         items.setdefault(event.event_type, [event, 0])[1] += 1
 
     sections = ""
-    for day, items in days.items():
+    for date, items in days.items():
         rows = ""
         for event, count in items.values():
             cat, mark = _event_category(event.event_type)
             label = event_label(event.event_type)
             rows += (f'<div class="ev" data-cat="{cat}"{" hidden" if cat == "scan" else ""}><span class="time">{when(event.created_at, clock=True)}</span>'
                      f"<span>{mark}</span><details><summary>{_esc(label)}"
-                     + (f' <span class="count">\u00d7{count} today, latest</span>' if count > 1 and names.get(day) == "Today"
+                     + (f' <span class="count">\u00d7{count} today, latest</span>' if count > 1 and names.get(date) == "Today"
                         else f' <span class="count">\u00d7{count}, latest</span>' if count > 1 else "")
                      + f' <span class="src">{_esc(event.source)}</span></summary><pre>{_esc(event.payload)}</pre></details></div>')
         newest = next(iter(items.values()))[0].created_at   # the heading follows the viewer's own day (TIME_SCRIPT)
-        heading = when(newest, clock="day", text=names.get(day))
+        heading = when(newest, clock="day", text=names.get(date))
         sections += f'<section class="day"><h2>{heading}</h2>{rows}</section>'
 
     buttons = "".join(f'<button type="button" data-filter="{cat}" aria-pressed="{str(cat == "important").lower()}">{label}</button>'

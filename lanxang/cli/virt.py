@@ -182,7 +182,6 @@ CPU / Memory:
     )
 
     try:                                            # disk health alerts; never fail the scan over them
-        from datetime import datetime
         from lanxang.monitoring.disks import run as disks_run
         from lanxang.posture.store import PostureStore
         disks_run(settings, PostureStore(), utcnow(), nodes)

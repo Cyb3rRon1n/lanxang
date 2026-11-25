@@ -8,7 +8,6 @@ device sightings so they link to devices by MAC and show as clues on Devices. Re
            no radios, so empty).
 """
 
-import json
 import os
 
 PASSWORD_ENV = "LANXANG_ROUTER_PASSWORD"

@@ -9,7 +9,7 @@ def test_load_config_defaults_when_no_file(isolated_cwd):
     assert config == AtlasConfig()
     assert config.name == "atlas-node"
     assert config.intelligence.provider == "none"
-    assert config.intelligence.model == "claude-opus-5"
+    assert config.intelligence.model == ""                  # no AI: no model
 
 
 def test_load_config_reads_atlas_yaml(isolated_cwd):
@@ -30,3 +30,11 @@ def test_load_config_reads_atlas_yaml(isolated_cwd):
     assert config.discovery.storage is True
     assert config.intelligence.provider == "ollama"
     assert config.intelligence.model == "llama3.1"
+
+
+def test_model_defaults_follow_the_provider():
+    from lanxang.config.models import IntelligenceConfig
+
+    assert IntelligenceConfig(provider="ollama").model == "qwen3:8b"
+    assert IntelligenceConfig(provider="anthropic").model == "claude-opus-5"
+    assert IntelligenceConfig(provider="ollama", model="llama3.1").model == "llama3.1"

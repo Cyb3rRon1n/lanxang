@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from types import SimpleNamespace
 
 from lanxang.config.models import AtlasConfig
 from lanxang.monitoring import internet
