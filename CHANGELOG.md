@@ -5,11 +5,6 @@ Docker image is published as `ghcr.io/cyb3rron1n/lanxang:<version>` for every re
 
 ## Unreleased
 
-### Changed
-- New logo: a Dok Champa, the national flower of Laos, inside the ring (it replaces the elephant). The app header,
-  browser icon, docs site, README and screenshots all use it.
-- The README explains where the name comes from.
-
 ### Security
 - Sign-in: parallel wrong passwords can no longer slip past the five-guess limit, and only a few password checks run
   at once.

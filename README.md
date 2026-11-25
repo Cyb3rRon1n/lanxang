@@ -140,8 +140,17 @@ Fa Ngum in 1353, *Lan Xang Hom Khao*, "the land of a million elephants and the w
 split into three kingdoms in 1707. A million elephants spoke of strength: a kingdom that could field them could
 hold its ground.
 
-The name also starts with **LAN**, the network Lanxang watches over. The logo is a Dok Champa, the frangipani that
-is the national flower of Laos, inside a ring.
+The name fits what Lanxang does:
+
+- **It starts with LAN**, the network it watches over.
+- **A kingdom knows its herd.** Lanxang knows every device on your network: which ones are new, which have gone
+  quiet, and where each one is plugged in.
+- **An elephant never forgets.** Lanxang keeps the history: what changed and when, when a device was last seen, how
+  long an outage lasted, how the week went.
+- **A herd watches over its own, calmly.** Lanxang watches and tells you; it never acts on its own, and anything that
+  changes your network asks you first.
+
+The elephant in the logo wears a Dok Champa, the frangipani that is the national flower of Laos.
 
 ## Contributing, security, license
 
