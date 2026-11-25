@@ -5,6 +5,8 @@ Docker image is published as `ghcr.io/cyb3rron1n/lanxang:<version>` for every re
 
 ## Unreleased
 
+## 1.6.0 - 2026-11-25
+
 ### Changed
 - An empty `intelligence.model` now means the provider's own default: `claude-opus-5` for anthropic, `qwen3:8b` for
   ollama (it was `claude-opus-5` for both, which Ollama doesn't have).
