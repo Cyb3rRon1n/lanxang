@@ -367,3 +367,14 @@ def test_messages_name_the_config_file_in_use(env, isolated_cwd):
         assert f"set in {name}" in render_settings_page()
         out = CliRunner().invoke(app, ["ports", "check"]).output
         assert f"security.port_watch is false in {name}" in out
+
+
+def test_a_saved_secret_is_not_sent_to_a_new_address(env, receiver, isolated_cwd):
+    url, got = receiver
+    assert handle_post("/api/settings/ntfy/save", {"url": url, "topic": "home", "token": "tk_secret"})[0] == 200
+
+    status, data = handle_post("/api/settings/ntfy/test", {"url": "http://127.0.0.1:9", "topic": "home", "token": ""})
+    assert status == 400 and "type the access token" in data["error"] and got == []
+
+    assert handle_post("/api/settings/ntfy/test", {"url": url, "topic": "home", "token": ""})[0] == 200
+    assert got[-1]["auth"] == "Bearer tk_secret"                                   # same address: the saved one is used

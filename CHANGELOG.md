@@ -14,6 +14,11 @@ Docker image is published as `ghcr.io/cyb3rron1n/lanxang:<version>` for every re
 - The address to return to after sign-in refuses tabs and line breaks (an open redirect and a header split).
 - Connections that stall mid-request are dropped after 30 seconds instead of holding a thread for good.
 - A non-ASCII API key, cookie or heartbeat token is rejected instead of dropping the connection.
+- `lanxang config` and `lanxang runtime` show passwords, tokens, API keys and webhook URLs as `***`.
+- `lanxang init` hides the Proxmox token or password as you type it and saves it to `inventory/secrets.json`
+  (mode 600) instead of the readable `lanxang.yaml`.
+- The Setup page's Test no longer sends a saved password or token to an address that was just changed: type it again
+  to test the new address.
 
 ### Fixed
 - The speed test card labels its low point "Slowest, 30 days" (it counted tests, not days).

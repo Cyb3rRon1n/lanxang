@@ -443,6 +443,32 @@ def _test_network(card, body, config, environ):
     return True, f"Connected: Proxmox VE {version}, {len(nodes)} node{'s' * (len(nodes) != 1)}."
 
 
+def _destination(card, config, body):
+    """Where this card's secrets get sent: the switch's address, or the card's host/URL field."""
+
+    if card == "switches":
+        name = str(body.get("name") or "").strip()
+        return next((s.host for s in config.wiring.switches if s.name == name), None)
+    field = next((f for f in CARDS[card][2] if f.key in ("host", "url") and f.path), None)
+
+    return _get(config.model_dump(), field.path) if field else None
+
+
+def _secrets_for_new_place(card, body, config):
+    """Labels of saved secrets this Test would send to an address they weren't saved for - they must be typed again,
+    or a changed host would receive the stored password (anyone signed in could aim it at a box they control)."""
+
+    if card == "ai" or _destination(card, config, body) == _destination(card, load_config(), body):
+        return []
+    from lanxang.wiring import env_key
+    fields = [f for f in CARDS[card][2] if f.kind == "secret"]
+    name = env_key(str(body.get("name") or "").strip()) if card == "switches" else ""
+
+    saved = local.secret_names()
+    # ponytail: only Setup-page secrets; a .env one can't be retyped here, so it would block the Test for good
+    return [f.label for f in fields if not body.get(f.key) and f.secret.format(name) in saved]
+
+
 def _test(card, body):
 
     from lanxang import notify
@@ -451,6 +477,9 @@ def _test(card, body):
         config, environ = load_config(), dict(os.environ)
     else:
         config, environ = _candidate(card, body)
+        retype = _secrets_for_new_place(card, body, config)
+        if retype:
+            return False, f"The address changed — type the {' and '.join(retype).lower()} again to test it there."
     if card in ("switches", "unifi", "proxmox"):
         return _test_network(card, body, config, environ)
     if card == "ups":

@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 from typer.testing import CliRunner
 
 from lanxang.cli.main import app
+from lanxang.config import local
 from lanxang.knowledge.queries import KnowledgeQueries
 
 
@@ -33,6 +34,15 @@ def test_config_shows_defaults(isolated_cwd):
 
     assert result.exit_code == 0
     assert "atlas-node" in result.output
+
+
+def test_config_hides_secrets(isolated_cwd):
+
+    (isolated_cwd / "lanxang.yaml").write_text("proxmox: {token_value: pve-secret}\n"
+                                                "notify: {webhooks: [https://hooks.example.org/abc]}\n")
+    result = runner.invoke(app, ["config"])
+
+    assert result.exit_code == 0 and "pve-secret" not in result.output and "hooks.example" not in result.output
 
 
 def test_init_declining_every_integration_writes_minimal_config(isolated_cwd):
@@ -75,12 +85,10 @@ def test_init_with_proxmox_token_auth_redacts_secret_from_log(isolated_cwd):
 
     written = (isolated_cwd / "lanxang.yaml").read_text()
 
-    assert "token_value: supersecret" in written
+    assert "supersecret" not in written and "token_value: ${LANXANG_PROXMOX_TOKEN}" in written
     assert "host: 192.168.1.10" in written
-    # The review screen shows the length, not the value - the value itself
-    # is expected in result.output too (it's the terminal session, not
-    # hidden input); the file this test name is actually about is the log.
-    assert "11 characters entered" in result.output
+    assert "11 characters entered" in result.output and "supersecret" not in result.output
+    assert local.secret_names() == {"LANXANG_PROXMOX_TOKEN"}
 
     log_text = (
         list((isolated_cwd / "logs").glob("lanxang-init-*.log"))[0].read_text()
@@ -107,7 +115,7 @@ def test_init_with_proxmox_password_auth(isolated_cwd):
 
     written = (isolated_cwd / "lanxang.yaml").read_text()
 
-    assert "password: hunter2" in written
+    assert "hunter2" not in written and "password: ${LANXANG_PROXMOX_PASSWORD}" in written
     assert "token_value: ''" in written
 
 

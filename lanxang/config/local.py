@@ -172,3 +172,16 @@ def apply_secrets(environ=None):
         if name in _APPLIED or not environ.get(name):      # an empty variable (compose's ${X:-}) counts as unset
             environ[name] = value
             _APPLIED.add(name)
+
+
+SECRET_KEY = re.compile(r"password|token_value|^token$|api_key|webhooks|apprise")
+
+
+def redacted(data):
+    """A config dump fit to print: secret values (and webhook/Apprise URLs, which carry their tokens) as ***."""
+
+    if isinstance(data, dict):
+        return {key: ("***" if value and SECRET_KEY.search(str(key)) else redacted(value)) for key, value in data.items()}
+    if isinstance(data, list):
+        return [redacted(item) for item in data]
+    return data
