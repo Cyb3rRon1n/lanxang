@@ -133,6 +133,16 @@ Run the installer again to upgrade: it keeps your `.env`, `lanxang.yaml` and dat
 - [Architecture](https://cyb3rron1n.github.io/lanxang/architecture/) and the [Roadmap](https://cyb3rron1n.github.io/lanxang/roadmap/), including what has been tested against real hardware
 - [Changelog](CHANGELOG.md)
 
+## The name
+
+Lanxang (ລ້ານຊ້າງ, *Lan Xang*) is Lao for "a million elephants". It was the name of the Lao kingdom founded by
+Fa Ngum in 1353, *Lan Xang Hom Khao*, "the land of a million elephants and the white parasol", which lasted until it
+split into three kingdoms in 1707. A million elephants spoke of strength: a kingdom that could field them could
+hold its ground.
+
+The name also starts with **LAN**, the network Lanxang watches over. The elephant in the logo wears a Dok Champa,
+the frangipani that is the national flower of Laos.
+
 ## Contributing, security, license
 
 Issues and pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Please report security problems privately as described in [SECURITY.md](SECURITY.md). Lanxang is MIT licensed.
