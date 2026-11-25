@@ -140,8 +140,8 @@ Fa Ngum in 1353, *Lan Xang Hom Khao*, "the land of a million elephants and the w
 split into three kingdoms in 1707. A million elephants spoke of strength: a kingdom that could field them could
 hold its ground.
 
-The name also starts with **LAN**, the network Lanxang watches over. The elephant in the logo wears a Dok Champa,
-the frangipani that is the national flower of Laos.
+The name also starts with **LAN**, the network Lanxang watches over. The logo is a Dok Champa, the frangipani that
+is the national flower of Laos, inside a ring.
 
 ## Contributing, security, license
 
