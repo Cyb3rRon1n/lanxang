@@ -143,6 +143,14 @@ def run(settings, store, now, *, get=fetch, send=None):
         found.append(issue("server", config.host, f"Can't read the UPS server at {config.host}", error, "watch",
                            "/settings#ups"))
         upses = old          # keep the last known state: a blip in reading it is not a power change
+        for name, info in upses.items():               # ... and its open problems stay open on the Alerts page
+            label = f"UPS {name}" + (f" ({info.get('model')})" if info.get("model") else "")
+            if info.get("state") in ("battery", "low"):
+                title = "Power cut - running on battery" if info["state"] == "battery" else "UPS battery low"
+                found.append(issue("power", name, f"{label}: {title.lower()}", _left(info), href="/uptime"))
+            if info.get("replace"):
+                found.append(issue("battery", name, f"{label} asks for a new battery",
+                                   "the UPS failed its battery test", "watch", "/uptime"))
 
     report("ups", found, now, store)
     for text in texts:

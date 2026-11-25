@@ -21,6 +21,21 @@ Docker image is published as `ghcr.io/cyb3rron1n/lanxang:<version>` for every re
   to test the new address.
 
 ### Fixed
+- One odd reply to an uptime check (an SSH port given as `http://...`) no longer stops the whole pass: that check is
+  down, the rest are saved and alerted, and the internet and heartbeat checks still run.
+- `lanxang scan` runs the NAS, Home Assistant, Pi-hole/AdGuard, router and summary checks even when LAN scanning is off
+  or the LAN scan fails.
+- A reading that doesn't come back no longer sends "Resolved" and then the same alert again:
+  - disks: a failed SMART or disk-list read;
+  - rogue DHCP: a probe error or nobody answering in time;
+  - ARP spoofing: the gateway's ARP entry ageing out;
+  - cable health: a switch that wasn't read;
+  - NAS pools and UPS power cuts: the NAS or UPS server not answering.
+- Traefik access-log times are stored as UTC when Traefik runs in a local time zone, so app sign-ins match their
+  requests again.
+- No "Name lookups work again" after an internet outage that never announced them failing.
+- The system resolver check stops at its timeout instead of waiting for a hung lookup.
+- A torrent VPN that recovers while muted is no longer announced as "working again" when the mute ends.
 - Deployment docs: the reverse-proxy override example names the `atlas` service (it said `lanxang`, which
   adds a new, broken service), and the cron and chat examples use `docker compose exec atlas`, which works whatever
   the containers are called.

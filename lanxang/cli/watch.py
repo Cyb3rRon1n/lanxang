@@ -99,60 +99,16 @@ def network_map(
     console.print("\nSaved - view it at /map in lanxang web.")
 
 
-@app.command(name="scan")
-def lan_scan(
-    json_output: bool = typer.Option(False, "--json", help="Print the result as JSON")
-):
-    """
-    Find every device on the LAN and update the device inventory: links
-    each sighting to a known device when certain, queues new devices for
-    triage, and sends alerts (every notify: channel) for new devices and
-    for important devices gone quiet. Run by the atlas-scan container.
-    """
+def _scan_extras(settings, store):
+    """The checks `lanxang scan` also runs - NAS, Home Assistant, DNS filter, router, summaries. They have no line
+    of their own in atlas-scan, so they run however the LAN part ends: off, failed or fine."""
 
-    from datetime import datetime
-    from lanxang.devices import lan
-    from lanxang.devices.notify import deliver
-    from lanxang.devices.store import InventoryStore
-
-    settings = load_config()
-
-    if not settings.scan.enabled:
-        console.print(f"LAN scanning is off (scan.enabled: false in {config_name()}).")
-        return
-
-    store = InventoryStore()
-    store.import_manual_hosts(settings.map.hosts)
-
-    try:
-        subnets, sightings = lan.scan(settings.scan.subnets, settings.scan.timeout)
-
-    except Exception as error:  # any failure is a failed source run, shown on Coverage
-        store.record_run("lan", [], ok=False, error=str(error))
-        console.print(f"[red]Scan failed:[/red] {error}")
-        raise typer.Exit(1)
-
-    if settings.scan.discover:
-        from lanxang.devices.discover import discover
-        announced = discover()
-        for sighting in sightings:
-            if sighting.ip in announced:
-                sighting.detail["announce"] = announced[sighting.ip]
-
-    result = store.record_run("lan", sightings)
-    result["subnets"] = subnets
-    from lanxang.devices import identify
-    identify.refresh(utcnow())     # the maker list for naming new devices; monthly, skipped offline
-    result["offline"] = store.queue_offline()
-    result["notify_errors"] = deliver(store, settings.notify, display=settings.display)
-    from lanxang.devices.notify import report_alerts
-    report_alerts(store, store.devices(), utcnow(), display=settings.display)
     if settings.dns_filter.enabled:
         try:
             from lanxang.monitoring.dnsfilter import run as dns_run
             from lanxang.posture.store import PostureStore
             dns_run(settings, PostureStore(), utcnow())
-        except Exception as error:                      # Pi-hole trouble never fails the LAN scan
+        except Exception as error:                      # Pi-hole trouble never stops the other checks
             console.print(f"[yellow]Pi-hole / AdGuard Home check failed: {error}[/yellow]")
 
     if settings.nas.enabled:
@@ -160,14 +116,14 @@ def lan_scan(
             from lanxang.monitoring.nas import run as nas_run
             from lanxang.posture.store import PostureStore
             nas_run(settings, PostureStore(), utcnow())
-        except Exception as error:                      # NAS trouble never fails the LAN scan
+        except Exception as error:                      # NAS trouble never stops the other checks
             console.print(f"[yellow]NAS check failed: {error}[/yellow]")
 
     if settings.router.enabled:
         from lanxang.devices import router
         try:
             store.record_run("router", router.sightings(router.fetch(settings.router)))
-        except Exception as error:                      # router trouble never fails the LAN scan
+        except Exception as error:                      # router trouble never stops the other checks
             store.record_run("router", [], ok=False, error=str(error))
             console.print(f"[yellow]Router check failed: {error}[/yellow]")
 
@@ -176,7 +132,7 @@ def lan_scan(
             from lanxang.monitoring.homeassistant import run as ha_run
             from lanxang.posture.store import PostureStore
             ha_run(settings, PostureStore(), utcnow())
-        except Exception as error:                      # Home Assistant trouble never fails the LAN scan
+        except Exception as error:                      # Home Assistant trouble never stops the other checks
             console.print(f"[yellow]Home Assistant check failed: {error}[/yellow]")
 
     try:                                                # Sunday evening: how the week went
@@ -195,6 +151,60 @@ def lan_scan(
     except Exception as error:
         console.print(f"[yellow]Daily summary failed: {error}[/yellow]")
 
+
+@app.command(name="scan")
+def lan_scan(
+    json_output: bool = typer.Option(False, "--json", help="Print the result as JSON")
+):
+    """
+    Find every device on the LAN and update the device inventory: links
+    each sighting to a known device when certain, queues new devices for
+    triage, and sends alerts (every notify: channel) for new devices and
+    for important devices gone quiet. Run by the atlas-scan container.
+    """
+
+    from datetime import datetime
+    from lanxang.devices import lan
+    from lanxang.devices.notify import deliver
+    from lanxang.devices.store import InventoryStore
+
+    settings = load_config()
+
+    store = InventoryStore()
+    if not settings.scan.enabled:
+        console.print(f"LAN scanning is off (scan.enabled: false in {config_name()}).")
+        _scan_extras(settings, store)
+        return
+
+    store.import_manual_hosts(settings.map.hosts)
+
+    try:
+        subnets, sightings = lan.scan(settings.scan.subnets, settings.scan.timeout)
+
+    except Exception as error:  # any failure is a failed source run, shown on Coverage
+        store.record_run("lan", [], ok=False, error=str(error))
+        console.print(f"[red]Scan failed:[/red] {error}")
+        _scan_extras(settings, store)
+        raise typer.Exit(1)
+
+    if settings.scan.discover:
+        from lanxang.devices.discover import discover
+        announced = discover()
+        for sighting in sightings:
+            if sighting.ip in announced:
+                sighting.detail["announce"] = announced[sighting.ip]
+
+    result = store.record_run("lan", sightings)
+    result["subnets"] = subnets
+    from lanxang.devices import identify
+    identify.refresh(utcnow())     # the maker list for naming new devices; monthly, skipped offline
+    try:
+        result["offline"] = store.queue_offline()
+        result["notify_errors"] = deliver(store, settings.notify, display=settings.display)
+        from lanxang.devices.notify import report_alerts
+        report_alerts(store, store.devices(), utcnow(), display=settings.display)
+    finally:
+        _scan_extras(settings, store)
     if result["new"] or result["offline"] or result["notify_errors"]:
         application.runtime.events.publish(
             AtlasEvent(event_type="atlas.devices.scan.completed", source="LanScan", payload=result)
@@ -737,7 +747,11 @@ def uptime_check(json_output: bool = typer.Option(False, "--json", help="Print t
     from lanxang.monitoring.uptime import UptimeStore, run
 
     settings, store, now = load_config(), UptimeStore(), utcnow()
-    results = run(settings, store, now)
+    results = {}
+    try:
+        results = run(settings, store, now)
+    except Exception as error:                         # nor do the uptime checks stop the internet and heartbeats
+        console.print(f"[yellow]Uptime checks failed: {error}[/yellow]")
     try:
         results = {**internet.run(settings, store, now), **results}
     except Exception as error:                         # the internet check never stops the uptime checks

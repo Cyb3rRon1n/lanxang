@@ -92,3 +92,23 @@ def test_home_storage_card_sums_disks_and_lists_problem_ones():
     assert rows[1]["name"] == "pve /dev/sdc" and "worn out" in rows[1]["detail"]
     healthy = build_storage([], {}, {}, {"nodes": [{"name": "pve", "disks": [_disk()]}]})
     assert healthy["state"] == "ok" and "all healthy" in healthy["rows"][0]["detail"]
+
+
+def test_a_failed_read_neither_clears_nor_re_alerts(temp_db):
+    from lanxang.alerts import AlertStore
+    from lanxang.posture.store import PostureStore
+
+    store, sent = PostureStore(temp_db), []
+    settings = AtlasConfig()
+    t = datetime(2026, 11, 17, 9)
+    scans = [[_disk(temp=75)], [_disk(temp=76, health="FAILED")],
+             [_disk(temp=None, health="")],                         # SMART and health didn't come back
+             [],                                                     # the disk list didn't come back at all
+             [_disk(temp=77, health="FAILED")]]
+    for i, found in enumerate(scans):
+        disks.run(settings, store, t + timedelta(minutes=15 * i), [{"name": "pve", "disks": found}], send=sent.append)
+        if i >= 2:
+            open_now = AlertStore(temp_db).listing(t + timedelta(minutes=15 * i))["open"]
+            assert len(open_now) == 2, i
+
+    assert sorted(s.key for s in sent) == ["disks:failed:pve:S1", "disks:hot:pve:S1"]   # nothing cleared, nothing twice

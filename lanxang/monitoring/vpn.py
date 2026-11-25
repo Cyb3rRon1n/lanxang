@@ -68,7 +68,10 @@ def check(clients, store, send=None, session=None):
 
     from lanxang.alerts import Text, allowed
     down = [(name, problem) for name, problem in down if allowed(store, Text("", f"vpn:vpn:{name}"))]
-    back = [name for name in back if allowed(store, Text("", f"vpn:vpn:{name}"))]
+    held = [name for name in back if not allowed(store, Text("", f"vpn:vpn:{name}"))]
+    for name in held:            # muted recovery: it's over now, not news for whenever the mute ends
+        state[name]["down"] = False
+    back = [name for name in back if name not in held]
 
     if down or back:
         lines = []

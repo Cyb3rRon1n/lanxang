@@ -13,6 +13,8 @@ def test_parse_line_and_bad_lines():
     e = parse_line(LINE.format(status=200))
     assert e == {"ip": "9.9.9.9", "time": datetime(2026, 10, 11, 2, 23, 12), "method": "GET",
                  "path": "/web/index.html", "status": 200, "service": "jellyfin"}
+    local = parse_line(LINE.replace("+0000", "-0500").format(status=200))
+    assert local["time"] == datetime(2026, 10, 11, 7, 23, 12)                          # stored as UTC
     assert parse_line("garbage") is None and parse_line(LINE.replace("9.9.9.9", "not-an-ip").format(status=200)) is None
 
 
