@@ -264,3 +264,62 @@ def test_pages_cannot_be_framed(secured):
     with OPENER.open(base + "/static/fonts/Lexend.woff2", timeout=5) as response:
         assert response.headers["X-Frame-Options"] == "DENY"
         assert response.headers["Content-Security-Policy"] == "frame-ancestors 'none'"
+
+
+def test_safe_next_blocks_control_characters():
+
+    for bad in ("/\t/evil.example", "/\n/evil.example", "/x\r\nSet-Cookie: a=b", "/\x7f"):
+        assert safe_next(bad) == "/"
+
+
+def test_parallel_guesses_stay_under_the_limit(tmp_path):
+
+    auth = Auth(tmp_path / "auth.json")
+    auth.set_password("the password")
+    results = []
+    threads = [threading.Thread(target=lambda: results.append(auth.login("bad", "10.0.0.9", now=50)))
+               for _ in range(MAX_FAILS * 3)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    assert results.count(None) == MAX_FAILS and results.count("limited") == MAX_FAILS * 2
+
+
+def test_non_ascii_secrets_are_just_wrong(tmp_path):
+
+    auth = Auth(tmp_path / "auth.json")
+    auth.set_password("the password")
+
+    assert not auth.valid_token("é") and not auth.check_setup_code("é") and not auth.valid_session("9999999999.é")
+
+
+def test_forwarded_header_only_counts_from_a_trusted_proxy(secured):
+
+    base, auth = secured
+    auth.set_password("a good password")
+
+    def login(password, visitor):
+        fields = urllib.parse.urlencode({"password": password}).encode()
+        return _call(base + "/login", fields, {"Origin": base, "X-Forwarded-For": visitor,
+                                               "Content-Type": "application/x-www-form-urlencoded"})[0]
+
+    handler = type("Handler", (AtlasWebHandler,), {"client_address": ("192.168.1.50", 1)})
+    fake = handler.__new__(handler)
+    fake.headers = {"X-Forwarded-For": "10.9.9.9"}
+    assert fake._client() == "192.168.1.50"          # a LAN visitor can't pick its own bucket
+    fake.client_address = ("172.18.0.5", 1)
+    assert fake._client() == "10.9.9.9"              # Docker's network (a proxy next to Lanxang) is believed
+    assert login("nope", "198.51.100.7") == 401      # loopback peer: still per visitor
+
+
+def test_setup_code_guesses_stop_at_the_limit(secured):
+
+    base, auth = secured
+    code = auth.setup_code()
+    for _ in range(MAX_FAILS):
+        assert _form(base, "/setup", {"code": "00000000"})[0] == 403
+    status, _, _ = _form(base, "/setup", {"code": code, "password": "a good password", "confirm": "a good password"})
+
+    assert status == 429 and not auth.configured()

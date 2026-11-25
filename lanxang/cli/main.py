@@ -607,7 +607,8 @@ def web(
         "[bold blue]Lanxang Web[/bold blue]\n"
     )
 
-    auth = Auth() if load_config().web.auth == "builtin" else None
+    web = load_config().web
+    auth = Auth() if web.auth == "builtin" else None
     if auth and not auth.configured():
         console.print(f"First run: open the page and set the admin password. Setup code: [bold]{auth.setup_code()}[/bold]")
 
@@ -616,7 +617,7 @@ def web(
     )
 
     try:
-        run_server(host, port, auth)
+        run_server(host, port, auth, trusted_proxies=web.trusted_proxies)
     except KeyboardInterrupt:
         console.print(
             "\n[yellow]Stopped.[/yellow]"

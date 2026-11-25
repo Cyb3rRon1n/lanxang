@@ -96,6 +96,10 @@ def safe_next(value):
 
     value = value or "/"
 
+    # browsers drop tabs and newlines from URLs ("/\t/evil" is "//evil"), and CR/LF would split the Location header
+    if any(ord(ch) < 0x20 or ord(ch) == 0x7f for ch in value):
+        return "/"
+
     return value if value.startswith("/") and not value.startswith("//") and "\\" not in value else "/"
 
 
@@ -108,9 +112,15 @@ def _notify_settings():
     except Exception:
         return None
 
+# loopback and Docker's default networks: where a reverse proxy next to Lanxang connects from
+TRUSTED_PROXIES = ("127.0.0.0/8", "::1/128", "172.16.0.0/12")
+
+
 class AtlasWebHandler(BaseHTTPRequestHandler):
 
     auth = None     # an lanxang.web.auth.Auth when web.auth is builtin; None = an auth proxy guards the host
+    trusted_proxies = TRUSTED_PROXIES   # peers whose X-Forwarded-For is believed (web.trusted_proxies)
+    timeout = 30    # seconds a connection may sit idle mid-request; without it a slow client holds a thread forever
 
     def _session_ok(self):
 
@@ -157,16 +167,17 @@ class AtlasWebHandler(BaseHTTPRequestHandler):
                                           for at, payload in query.events_since([kind], since)]}
 
     def _client(self):
-        """Who is signing in, for the wrong-password limit: behind a reverse proxy on a private address every request
-        comes from the proxy, so count the address the proxy says it served (the last X-Forwarded-For entry) instead.
-        From a public address the header is ignored - anyone could write it."""
+        """Who is signing in, for the wrong-password limit: behind a reverse proxy every request comes from the proxy,
+        so count the address the proxy says it served (the last X-Forwarded-For entry) instead. Only a peer in
+        web.trusted_proxies is believed - anyone else could write the header to dodge the limit or lock someone out."""
 
         import ipaddress
 
         client = self.client_address[0]
         forwarded = (self.headers.get("X-Forwarded-For") or "").split(",")[-1].strip()
         try:
-            if forwarded and ipaddress.ip_address(client).is_private:
+            peer = ipaddress.ip_address(client)
+            if forwarded and any(peer in ipaddress.ip_network(net, strict=False) for net in self.trusted_proxies):
                 return str(ipaddress.ip_address(forwarded))
         except ValueError:
             pass
@@ -243,11 +254,13 @@ class AtlasWebHandler(BaseHTTPRequestHandler):
             if self.auth.configured():
                 self._redirect("/login")
                 return
+            if self.auth.limited(client):
+                self._send(429, "text/html; charset=utf-8", render_setup_page("Too many attempts — wait a few minutes."))
+                return
             if not self.auth.check_setup_code(field("code")):
                 # wrong codes count against the same per-client limit as wrong passwords
                 self.auth.login("", client)
-                error = "Too many attempts — wait a few minutes." if self.auth.limited(client) else "That setup code is not right."
-                self._send(403, "text/html; charset=utf-8", render_setup_page(error))
+                self._send(403, "text/html; charset=utf-8", render_setup_page("That setup code is not right."))
                 return
             if field("password") != field("confirm"):
                 self._send(400, "text/html; charset=utf-8", render_setup_page("The passwords don't match."))
@@ -745,7 +758,7 @@ class AtlasWebHandler(BaseHTTPRequestHandler):
         self.wfile.write(encoded)
 
 
-def run_server(host="127.0.0.1", port=8420, auth=None):
+def run_server(host="127.0.0.1", port=8420, auth=None, trusted_proxies=None):
     """
     Blocks until interrupted (Ctrl+C) - on-demand like every other
     Lanxang command, not a background/daemon process; the user starts
@@ -756,7 +769,8 @@ def run_server(host="127.0.0.1", port=8420, auth=None):
     from lanxang.web import render
 
     render.SIGN_OUT = auth is not None
-    handler = type("AtlasWebHandler", (AtlasWebHandler,), {"auth": auth}) if auth else AtlasWebHandler
+    handler = type("AtlasWebHandler", (AtlasWebHandler,),
+                   {"auth": auth, "trusted_proxies": tuple(trusted_proxies or TRUSTED_PROXIES)})
     httpd = ThreadingHTTPServer((host, port), handler)
 
     try:
