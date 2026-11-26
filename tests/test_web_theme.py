@@ -43,3 +43,12 @@ def test_light_is_default_system_only_when_chosen():
     for path in (Path(__file__).resolve().parents[1] / "lanxang").rglob("*"):
         if path.suffix in {".py", ".js", ".html", ".css"} and path.name != "render.py":
             assert "prefers-color-scheme" not in path.read_text(), path
+
+
+def test_sidebar_links_to_the_repo():
+    from lanxang import __version__
+    from lanxang.web.render import REPO_URL, render_page
+
+    html = render_page("Home", "<p>x</p>")
+    assert f'href="{REPO_URL}" target="_blank" rel="noopener noreferrer"' in html
+    assert f"Lanxang {__version__} on GitHub" in html
