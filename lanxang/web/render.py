@@ -10,6 +10,7 @@ and server.py.
 
 from html import escape
 
+from lanxang import __version__
 from lanxang.health.alerts import container_state
 from lanxang.web.icons import icon
 from lanxang.web.blocks import BLOCKS_STYLE
@@ -554,6 +555,8 @@ NAV_ICONS = {"home": "home", "alerts": "alert", "network": "network", "servers":
              "settings": "tool"}
 
 # Rendered twice (page header; phone top bar), so classes, not ids. The theme icon follows data-theme from CSS.
+REPO_URL = "https://github.com/Cyb3rRon1n/lanxang"
+
 HEADER_BAR = (
     '<div class="hbar"><button type="button" class="icon-btn theme-cycle" onclick="lanxangTheme()" '
     'aria-label="Theme: Light. Switch to Dark" title="Theme: Light">'
@@ -610,6 +613,8 @@ def render_page(title, body_html, active="", tabs=None, drawer=True, heading=Non
         f"<aside class=\"side\"><a class=\"brand\" href=\"/?home\" title=\"Lanxang home\">{LOGO}<span class=\"name\">Lanxang<small lang=\"lo\">ລ້ານຊ້າງ</small></span></a>"
         f"<nav class=\"main\" aria-label=\"Main\"><ul>{''.join(items)}</ul></nav>"
         f"<div class=\"foot\">{chat_link}{HEADER_BAR}"
+        + f'<a href="{REPO_URL}" target="_blank" rel="noopener noreferrer" title="Lanxang {__version__} on GitHub">'
+        f'{icon("github")}<span class="lbl">GitHub</span></a>'
         + ('<form method="post" action="/logout"><button title="Sign out">' + icon("logout")
            + '<span class="lbl">Sign out</span></button></form>' if SIGN_OUT else "")
         + '<button type="button" class="side-toggle" aria-pressed="false" title="Collapse sidebar">'

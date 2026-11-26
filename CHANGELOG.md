@@ -5,6 +5,10 @@ Docker image is published as `ghcr.io/cyb3rron1n/lanxang:<version>` for every re
 
 ## Unreleased
 
+### Added
+- A GitHub link at the foot of the sidebar opens the project page in a new tab; hovering it shows the running
+  version.
+
 ## 1.6.0 - 2026-11-25
 
 ### Changed
